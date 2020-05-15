@@ -6,6 +6,23 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
+  const all = () => good + neutral + bad
+  const average = () => {
+    const votes = all()
+    if (votes <= 0) {
+      return 0
+    }
+
+    return (good - bad) / votes
+  }
+  const percentGood = () => {
+    const votes = all()
+    if (votes <= 0) {
+      return 0
+    }
+
+    return (good / votes) * 100.0
+  }
 
   return (
     <>
@@ -21,6 +38,9 @@ const App = () => {
         good {good} <br/>
         neutral {neutral} <br/>
         bad {bad} <br/>
+        all {all()} <br/>
+        average {average()} <br/>
+        positive {percentGood()} %<br/>
       </p>
     </>
   )
