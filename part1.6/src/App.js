@@ -3,7 +3,10 @@ import './App.css'
 
 const Statistic = ({ name, value }) => {
   return (
-    <span>{name} {value}</span>
+    <tr>
+      <td>{name}</td>
+      <td>{value}</td>
+    </tr>
   )
 }
 
@@ -30,14 +33,16 @@ const Statistics = ({ good, neutral, bad }) => {
   }
 
   return (
-    <p>
-      <Statistic name="good" value={good} /> <br />
-      <Statistic name="neutral" value={neutral} /> <br />
-      <Statistic name="bad" value={bad} /> <br />
-      <Statistic name="all" value={all} /> <br />
-      <Statistic name="average" value={average} /> <br />
-      <Statistic name="positive" value={`${percentGood} %`} /> <br />
-    </p>
+    <table>
+      <tbody>
+        <Statistic name="good" value={good} />
+        <Statistic name="neutral" value={neutral} />
+        <Statistic name="bad" value={bad} />
+        <Statistic name="all" value={all} />
+        <Statistic name="average" value={average} />
+        <Statistic name="positive" value={`${percentGood} %`} />
+      </tbody>
+    </table>
   )
 }
 
@@ -60,6 +65,8 @@ const App = () => {
       <Button onClick={() => setGood(good + 1)} name="good" />
       <Button onClick={() => setNeutral(neutral + 1)} name="neutral" />
       <Button onClick={() => setBad(bad + 1)} name="bad" />
+
+      <h1>statistics</h1>
 
       <Statistics good={good} neutral={neutral} bad={bad} />
     </>
