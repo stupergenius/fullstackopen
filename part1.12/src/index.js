@@ -4,8 +4,17 @@ import './index.css'
 
 const App = ({anecdotes}) => {
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState(Object.fromEntries(anecdotes.map(a => [a, 0])))
+  const currentAnecdote = anecdotes[selected]
 
-  const handleClick = () => {
+  const handleVoteClick = () => {
+    setVotes({
+      ...votes,
+      [currentAnecdote]: votes[currentAnecdote] + 1
+    })
+  }
+
+  const handleNextClick = () => {
     const newIndex = Math.floor(
       Math.random() * anecdotes.length)
     
@@ -14,8 +23,9 @@ const App = ({anecdotes}) => {
 
   return (
     <div>
-      <p>{anecdotes[selected]}</p>
-      <button onClick={handleClick}>next anecdote</button>
+      <p>{currentAnecdote}</p>
+      <button onClick={handleVoteClick}>vote</button>
+      <button onClick={handleNextClick}>next anecdote</button>
     </div>
   )
 }
