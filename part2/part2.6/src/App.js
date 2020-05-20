@@ -4,7 +4,7 @@ import './App.css'
 const Person = ({person}) => {
   return (
     <>
-      <span>{person.name}</span>
+      <span>{person.name} {person.phone}</span>
       <br />
     </>
   )
@@ -12,12 +12,17 @@ const Person = ({person}) => {
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    { name: 'Arto Hellas', phone: '040-1234567' }
   ])
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
 
   const handleNameChange = ({ target }) => {
     setNewName(target.value)
+  }
+
+  const handleNumberChange = ({ target }) => {
+    setNewNumber(target.value)
   }
 
   const handleFormSubmit = (event) => {
@@ -29,10 +34,11 @@ const App = () => {
       return
     }
 
-    const newPerson = { name: newName }
+    const newPerson = { name: newName, phone: newNumber }
 
     setPersons(persons.concat(newPerson))
     setNewName('')
+    setNewNumber('')
   }
 
   return (
@@ -41,6 +47,9 @@ const App = () => {
       <form>
         <div>
           name: <input value={newName} onChange={handleNameChange} />
+        </div>
+        <div>
+          number: <input value={newNumber} onChange={handleNumberChange} />
         </div>
         <div>
           <button type="submit" onClick={handleFormSubmit}>add</button>
