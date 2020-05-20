@@ -23,6 +23,12 @@ const App = () => {
   const handleFormSubmit = (event) => {
     event.preventDefault()
 
+    const existingNames = persons.map(p => p.name)
+    if (existingNames.includes(newName)) {
+      alert(`${newName} is already added to phonebook`)
+      return
+    }
+
     const newPerson = { name: newName }
 
     setPersons(persons.concat(newPerson))
