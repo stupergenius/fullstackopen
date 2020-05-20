@@ -12,17 +12,30 @@ const Person = ({person}) => {
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', phone: '040-1234567' }
+    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Ada Lovelace', number: '39-44-5323523' },
+    { name: 'Dan Abramov', number: '12-43-234345' },
+    { name: 'Mary Poppendieck', number: '39-23-6423122' }
   ])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const handleNameChange = ({ target }) => {
-    setNewName(target.value)
-  }
+  const personsToShow = searchQuery.length > 0
+    ? persons.filter(p => p.name.toLocaleLowerCase().includes(searchQuery))
+    : persons
 
-  const handleNumberChange = ({ target }) => {
-    setNewNumber(target.value)
+  const handleNameChange = ({ target }) => setNewName(target.value)
+
+  const handleNumberChange = ({ target }) => setNewNumber(target.value)
+
+  const handleSearchQueryChange = ({ target }) => {
+    const query = target.value
+    if (query == null) {
+      setSearchQuery('')
+    } else {
+      setSearchQuery(query.trim().toLocaleLowerCase())
+    }
   }
 
   const handleFormSubmit = (event) => {
@@ -44,6 +57,12 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <div>
+        filter shown with:
+        <input onChange={handleSearchQueryChange} />
+      </div>
+
       <form>
         <div>
           name: <input value={newName} onChange={handleNameChange} />
@@ -57,7 +76,7 @@ const App = () => {
       </form>
 
       <h2>Numbers</h2>
-      {persons.map(p =>
+      {personsToShow.map(p =>
         <Person key={p.name} person={p} />
       )}
     </div>
