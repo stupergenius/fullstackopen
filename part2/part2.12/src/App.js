@@ -12,9 +12,17 @@ const Filter = ({ onChange }) => {
 }
 
 const CountryListItem = ({ country }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const handleShowClick = () => setIsExpanded(true)
+
+  if (isExpanded) {
+    return <CountryInfo country={country} />
+  }
+
   return (
     <div>
-      <span>{country.name}</span>
+      <span>{country.name}</span>&nbsp;
+      <button onClick={handleShowClick}>show</button>
     </div>
   )
 }
