@@ -27,16 +27,68 @@ const CountryListItem = ({ country }) => {
   )
 }
 
+const WeatherInfo = ({ placeName, location }) => {
+  const [temperature, setTemperature] = useState('')
+  const [icon, setIcon] = useState(null)
+  const [wind, setWind] = useState('')
+
+  useEffect(() => {
+    const url = `https://fcc-weather-api.glitch.me/api/current?lat=${location[0]}&lon=${location[1]}`
+    axios.get(url).then(({data}) => {
+      if (data.error) {
+        setIcon(null)
+        setTemperature('error')
+        setWind('error')
+        return
+      }
+
+      if (Array.isArray(data.weather) && data.weather.length > 0) {
+        setIcon(data.weather[0].icon)
+      } else {
+        setIcon(null)
+      }
+
+      if (typeof data.main === 'object' && typeof data.main.temp === 'number') {
+        setTemperature(`${Math.round(data.main.temp)} celsius`)
+      } else {
+        setTemperature('N/A')
+      }
+
+      if (typeof data.wind === 'object' && typeof data.wind.speed === 'number') {
+        setWind(`${Math.round(data.wind.speed)} mph`)
+      } else {
+        setWind('N/A')
+      }
+    })
+  }, [location])
+
+  return (
+    <div>
+      <h3>Weather in {placeName}</h3>
+      <p>
+        <b>temperature: </b> {temperature} <br />
+        {icon != null &&
+          <><img
+            src={icon}
+            alt="weather condition"
+            width="50" /> <br/></>
+        }
+        <b>wind: </b> {wind}
+      </p>
+    </div>
+  )
+}
+
 const CountryInfo = ({ country }) => {
   return (
     <div>
       <h2>{country.name}</h2>
       <p>
-        capital {country.capital} <br/>
+        capital {country.capital} <br />
         population {country.population}
       </p>
 
-      <h3>languages</h3>
+      <h3>Spoken languages</h3>
       <ul>
         {country.languages.map(l => {
           return <li key={l.iso639_2}>{l.name}</li>
@@ -47,6 +99,8 @@ const CountryInfo = ({ country }) => {
         alt={`${country.name} country flag`}
         src={country.flag}
         width="100" />
+
+      <WeatherInfo placeName={country.capital} location={country.latlng} />
     </div>
   )
 }
