@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react'
 import personsService from './services/persons'
 import './App.css'
 
-const Persons = ({ persons }) => persons.map(p =>
-  <Person key={p.name} person={p} />
+const Persons = ({ persons, onDeletePerson }) => persons.map(p =>
+  <Person key={p.name} person={p} onDeletePerson={onDeletePerson} />
 )
 
-const Person = ({ person }) => {
+const Person = ({ person, onDeletePerson }) => {
+  const handleDelete = () => onDeletePerson(person)
+
   return (
-    <>
+    <div>
       <span>{person.name} {person.phone}</span>
+      &nbsp;<button onClick={handleDelete}>delete</button>
       <br />
-    </>
+    </div>
   )
 }
 
@@ -87,6 +90,14 @@ const App = () => {
     setNewNumber('')
   }
 
+  const handleDeletePerson = person => {
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personsService.delete(person.id).then(() => {
+        setPersons(persons.filter(p => p.id !== person.id))
+      })
+    }
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -102,7 +113,7 @@ const App = () => {
         onSubmit={handleFormSubmit} />
 
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} onDeletePerson={handleDeletePerson} />
     </div>
   )
 }
