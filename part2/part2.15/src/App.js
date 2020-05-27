@@ -72,22 +72,39 @@ const App = () => {
     }
   }
 
-  const handleFormSubmit = (event) => {
-    event.preventDefault()
+  const updateExistingPerson = (existingPerson, newPerson) => {
+    personsService.update(existingPerson.id, newPerson).then(data => {
+      setPersons(persons.map(p => p.id === existingPerson.id ? data : p))
+    })
 
-    const existingNames = persons.map(p => p.name)
-    if (existingNames.includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
-      return
-    }
+    clearForm()
+  }
 
-    const newPerson = { name: newName, phone: newNumber }
+  const createNewPerson = newPerson => {
     personsService.create(newPerson).then(data => {
       setPersons(persons.concat(data))
     })
 
+    clearForm()
+  }
+
+  const clearForm = () => {
     setNewName('')
     setNewNumber('')
+  }
+
+  const handleFormSubmit = event => {
+    event.preventDefault()
+
+    const newPerson = { name: newName, phone: newNumber }
+    const existingPerson = persons.find(p => p.name === newName)
+    if (existingPerson) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        updateExistingPerson(existingPerson, newPerson)
+      }
+    } else {
+      createNewPerson(newPerson)
+    }
   }
 
   const handleDeletePerson = person => {
