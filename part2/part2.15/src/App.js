@@ -2,6 +2,28 @@ import React, { useState, useEffect } from 'react'
 import personsService from './services/persons'
 import './App.css'
 
+const Notification = ({ type, message }) => {
+  if (message === null) {
+    return null
+  }
+
+  const styles = {
+    color: type === 'error' ? 'red' : 'green',
+    background: 'lightgrey',
+    fontSize: '20px',
+    borderStyle: 'solid',
+    borderRadius: '5px',
+    padding: '10px',
+    marginBottom: '10px',
+  }
+
+  return (
+    <div style={styles}>
+      {message}
+    </div>
+  )
+}
+
 const Persons = ({ persons, onDeletePerson }) => persons.map(p =>
   <Person key={p.name} person={p} onDeletePerson={onDeletePerson} />
 )
@@ -48,6 +70,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personsService.getAll().then(data => {
@@ -73,9 +97,14 @@ const App = () => {
   }
 
   const updateExistingPerson = (existingPerson, newPerson) => {
-    personsService.update(existingPerson.id, newPerson).then(data => {
-      setPersons(persons.map(p => p.id === existingPerson.id ? data : p))
-    })
+    personsService.update(existingPerson.id, newPerson)
+      .then(data => {
+        setPersons(persons.map(p => p.id === existingPerson.id ? data : p))
+        showSuccess(`Updated ${existingPerson.name}`)
+      })
+      .catch(error => {
+        showError(`Information of ${existingPerson.name} has already been removed from server`)
+      })
 
     clearForm()
   }
@@ -83,9 +112,22 @@ const App = () => {
   const createNewPerson = newPerson => {
     personsService.create(newPerson).then(data => {
       setPersons(persons.concat(data))
+      showSuccess(`Added ${newPerson.name}`)
     })
 
     clearForm()
+  }
+
+  const showSuccess = message => {
+    setSuccessMessage(message)
+
+    setTimeout(() => setSuccessMessage(null), 3000)
+  }
+
+  const showError = message => {
+    setErrorMessage(message)
+
+    setTimeout(() => setErrorMessage(null), 3000)
   }
 
   const clearForm = () => {
@@ -118,6 +160,9 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification type="success" message={successMessage} />
+      <Notification type="error" message={errorMessage} />
 
       <Filter onChange={handleSearchQueryChange} />
 
