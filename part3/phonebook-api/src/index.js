@@ -1,9 +1,11 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const personsRouter = require('./routes/persons')
 const db = require('./data/db')
 
 const app = express()
+app.use(cors())
 app.use(express.json())
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
