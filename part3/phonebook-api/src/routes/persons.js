@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const db = require('../data/db')
 
+const generateId = () => Math.round(Math.random() * 1000000000)
+
 router.get('/', (req, res) => {
   res.send(db.persons)
 })
@@ -18,6 +20,17 @@ router.get('/:id', (req, res) => {
   }
 
   res.send(person)
+})
+
+router.post('/', (req, res) => {
+  const newPerson = {
+    name: req.body.name,
+    number: req.body.number,
+    id: generateId()
+  }
+  db.persons.push(newPerson)
+
+  res.send(newPerson)
 })
 
 router.delete('/:id', (req, res) => {
