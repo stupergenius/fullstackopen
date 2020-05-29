@@ -1,0 +1,23 @@
+@baseUrl = http://localhost:3001/api
+
+### List all persons
+
+{{baseUrl}}/persons
+
+### Get a single person
+
+{{baseUrl}}/persons/1
+
+### Create a new person
+
+POST {{baseUrl}}/persons
+Content-Type: application/json
+
+{
+    "name": "Test User",
+    "number": "555-555-5555"
+}
+
+### Delete a person
+
+DELETE {{baseUrl}}/persons/4
