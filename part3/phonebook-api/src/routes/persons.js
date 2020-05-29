@@ -23,6 +23,20 @@ router.get('/:id', (req, res) => {
 })
 
 router.post('/', (req, res) => {
+  if (!req.body || !req.body.name || !req.body.number) {
+    return res
+      .status(400)
+      .send({ error: 'no body given' })
+      .end()
+  }
+
+  if (db.persons.some(p => p.name === req.body.name)) {
+    return res
+      .status(400)
+      .send({ error: 'name must be unique' })
+      .end()
+  }
+
   const newPerson = {
     name: req.body.name,
     number: req.body.number,
