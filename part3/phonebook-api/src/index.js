@@ -4,10 +4,12 @@ const personsRouter = require('./routes/persons')
 const db = require('./data/db')
 
 const app = express()
-app.use(morgan(app.get('env') === 'production' ? 'common' : 'dev'))
 app.use(express.json())
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
+
+morgan.token('post-body', require('./util/postbody_token'))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'))
 
 app.get('/info', (req, res) => {
   res.render('info', { numPersons: db.persons.length, now: Date() })
