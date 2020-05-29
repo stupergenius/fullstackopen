@@ -1,8 +1,10 @@
 const express = require('express')
+const morgan = require('morgan')
 const personsRouter = require('./routes/persons')
 const db = require('./data/db')
 
 const app = express()
+app.use(morgan(app.get('env') === 'production' ? 'common' : 'dev'))
 app.use(express.json())
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
