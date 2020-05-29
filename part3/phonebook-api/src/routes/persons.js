@@ -20,4 +20,14 @@ router.get('/:id', (req, res) => {
   res.send(person)
 })
 
+router.delete('/:id', (req, res) => {
+  const id = Number(req.params.id)
+  if (isNaN(id)) {
+    return res.status(204).end()
+  }
+
+  db.persons = db.persons.filter(p => p.id !== id)
+  res.status(204).end()
+})
+
 module.exports = router
