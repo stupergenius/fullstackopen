@@ -1,34 +1,37 @@
 const express = require('express')
 const app = express()
 app.use(express.json())
+app.set('view engine', 'hbs')
+app.set('views', __dirname + '/views')
 
-const db = {
-  "persons": [
-    {
-      "name": "Arto Hellas",
-      "number": "040-123456",
-      "id": 1
-    },
-    {
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-      "id": 2
-    },
-    {
-      "name": "Dan Abramov",
-      "number": "12-43-234345",
-      "id": 3
-    },
-    {
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122",
-      "id": 4
-    }
-  ]
-}
+const db = [
+  {
+    "name": "Arto Hellas",
+    "number": "040-123456",
+    "id": 1
+  },
+  {
+    "name": "Ada Lovelace",
+    "number": "39-44-5323523",
+    "id": 2
+  },
+  {
+    "name": "Dan Abramov",
+    "number": "12-43-234345",
+    "id": 3
+  },
+  {
+    "name": "Mary Poppendieck",
+    "number": "39-23-6423122",
+    "id": 4
+  }
+]
+
+app.get('/info', (req, res) => {
+  res.render('info', { numPersons: db.length, now: Date() })
+})
 
 const personsRoute = app.route('/api/persons')
-
 personsRoute.get((req, res) => {
   res.send(db)
 })
