@@ -1,0 +1,9 @@
+dispatch:
+    # Send all api traffic to the default app
+    - url: "*/api/*"
+      service: default
+    - url: "*/info"
+      service: default
+    # Route web traffic to web app
+    - url: "*/*"
+      service: web

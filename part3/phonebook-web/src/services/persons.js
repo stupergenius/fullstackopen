@@ -1,5 +1,7 @@
 import axios from 'axios'
-const baseUrl = 'http://localhost:3001/api/persons'
+import env from './env'
+
+const baseUrl = `${env.config('baseUrl')}/persons`
 
 const getAll = () => {
   const request = axios.get(baseUrl)
