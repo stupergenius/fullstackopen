@@ -11,6 +11,16 @@ const exit = (code) => {
   process.exit(code || 0)
 }
 
+const errorHandler = e => {
+  console.log(e)
+  exit(1)
+}
+
+const usage = () => {
+  console.log('Please provide at least the database password as an argument: node mongo.js <password> [<name> <number>]')
+  exit(1)
+}
+
 const createPerson = ({name, number}) => {
   const person = new Person({name, number})
   person.save()
@@ -19,20 +29,33 @@ const createPerson = ({name, number}) => {
       exit()
     })
     .catch(e => {
-      console.log('error adding person to phonebook:', e)
-      exit(1)
+      console.log('error adding person to phonebook')
+      errorHandler(e)
     })
 }
 
 const listPersons = () => {
-  console.log('todo: list persons')
+  console.log('phonebook:')
 
-  exit()
+  Person.find({})
+    .then(results => {
+      for (const person of results) {
+        console.log(`${person.name} ${person.number}`)
+      }
+      
+      exit()
+    })
+    .catch(errorHandler)
 }
 
-const usage = () => {
-  console.log('Please provide at least the database password as an argument: node mongo.js <password> [<name> <number>]')
-  exit(1)
+const runCmd = () => {
+  if (process.argv.length === 5) {
+    createPerson({name: process.argv[3], number: process.argv[4]})
+  } else if (process.argv.length === 3) {
+    listPersons()
+  } else {
+    usage()
+  }
 }
 
 const main = () => {
@@ -42,15 +65,10 @@ const main = () => {
 
   const password = process.argv[2]
   const url = `mongodb+srv://phonebook-app:${password}@cluster0-9kbla.gcp.mongodb.net/phonebook-app?retryWrites=true&w=majority`
-  mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-
-  if (process.argv.length === 5) {
-    createPerson({name: process.argv[3], number: process.argv[4]})
-  } else if (process.argv.length === 3) {
-    listPersons()
-  } else {
-    usage()
-  }
+  mongoose
+    .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(runCmd)
+    .catch(errorHandler)
 }
 
 main()
