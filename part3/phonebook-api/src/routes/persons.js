@@ -1,25 +1,32 @@
 const express = require('express')
 const router = express.Router()
 const db = require('../data/db')
+const Person = require('../data/person')
 
 const generateId = () => Math.round(Math.random() * 1000000000)
 
 router.get('/', (req, res) => {
-  res.send(db.persons)
+  Person.find({})
+    .then(persons => {
+      res.send(persons)
+    })
 })
 
 router.get('/:id', (req, res) => {
-  const id = Number(req.params.id)
-  if (isNaN(id)) {
-    return res.status(404).end()
+  const id = req.params.id
+  if (id == null || id == "") {
+    return res
+      .status(404)
+      .send({error: "invalid id given"})
+      .end()
   }
 
-  const person = db.persons.find(p => p.id === id)
-  if (!person) {
-    return res.status(404).end()
-  }
-
-  res.send(person)
+  const person = Person.findById(id)
+    .then(person => res.send(person))
+    .catch(e => {
+      console.log(e)
+      res.status(404).end()
+    })
 })
 
 router.post('/', (req, res) => {

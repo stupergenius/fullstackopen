@@ -1,3 +1,7 @@
+# Environment Variables
+env_variables.yaml
+.env
+
 # Logs
 logs
 *.log
