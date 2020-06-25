@@ -3,7 +3,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const personsRouter = require('./routes/persons')
-const db = require('./data/db')
+const Person = require('./data/person')
 
 const app = express()
 app.use(cors())
@@ -14,8 +14,10 @@ app.set('views', __dirname + '/views')
 morgan.token('post-body', require('./util/postbody_token'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'))
 
-app.get('/info', (req, res) => {
-  res.render('info', { numPersons: db.persons.length, now: Date() })
+app.get('/info', (req, res, next) => {
+  Person.countDocuments()
+    .then(numPersons => res.render('info', {numPersons}))
+    .catch(e => next(e))
 })
 
 app.use('/api/persons', personsRouter)
