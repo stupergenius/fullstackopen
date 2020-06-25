@@ -6,7 +6,7 @@
 
 ### Get a single person
 
-{{baseUrl}}/persons/5ef4a801ce3e2608e7fdaec4
+{{baseUrl}}/persons/5ed7b070be873d049befd651
 
 ### Create a new person
 
@@ -17,6 +17,17 @@ Content-Type: application/json
     "name": "Test User 1",
     "number": "555-555-5555"
 }
+
+### Update an existing person
+
+PUT {{baseUrl}}/persons/5ed7b070be873d049befd651
+Content-Type: application/json
+
+{
+    "name": "ben2",
+    "number": "555-555-5555"
+}
+
 
 ### Delete a person
 
