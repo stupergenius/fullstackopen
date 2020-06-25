@@ -102,9 +102,7 @@ const App = () => {
         setPersons(persons.map(p => p.id === existingPerson.id ? data : p))
         showSuccess(`Updated ${existingPerson.name}`)
       })
-      .catch(error => {
-        showError(`Information of ${existingPerson.name} has already been removed from server`)
-      })
+      .catch(e => showError(parseResponseError(e)))
 
     clearForm()
   }
@@ -115,9 +113,7 @@ const App = () => {
         setPersons(persons.concat(data))
         showSuccess(`Added ${newPerson.name}`)
       })
-      .catch(e => {
-        showError(`Error adding ${newPerson.name}`)
-      })
+      .catch(e => showError(parseResponseError(e)))
 
     clearForm()
   }
@@ -126,6 +122,13 @@ const App = () => {
     setSuccessMessage(message)
 
     setTimeout(() => setSuccessMessage(null), 3000)
+  }
+
+  const parseResponseError = error => {
+    if (error.response && error.response.data && error.response.data.error) {
+      return error.response.data.error
+    }
+    return 'Error making request'
   }
 
   const showError = message => {

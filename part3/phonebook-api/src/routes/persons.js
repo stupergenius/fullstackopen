@@ -55,7 +55,7 @@ router.put('/:id', (req, res, next) => {
   }
 
   const personData = { name: req.body.name, number: req.body.number }
-  Person.findByIdAndUpdate(id, personData, { new: true })
+  Person.findByIdAndUpdate(id, personData, { new: true, runValidators: true })
     .then(person => res.send(person))
     .catch(e => next(e))
 })
