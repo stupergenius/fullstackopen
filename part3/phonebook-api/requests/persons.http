@@ -31,4 +31,4 @@ Content-Type: application/json
 
 ### Delete a person
 
-DELETE {{baseUrl}}/persons/5ef4a801ce3e2608e7fdaec4
+DELETE {{baseUrl}}/persons/5ef5014e60f744120128c359

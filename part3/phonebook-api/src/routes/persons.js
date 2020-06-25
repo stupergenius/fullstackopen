@@ -15,7 +15,7 @@ router.get('/:id', (req, res, next) => {
   if (id == null || id == "") {
     return res
       .status(404)
-      .send({error: "malformatted id"})
+      .send({ error: "malformatted id" })
       .end()
   }
 
@@ -31,26 +31,9 @@ router.get('/:id', (req, res, next) => {
 })
 
 router.post('/', (req, res, next) => {
-  if (!req.body || !req.body.name || !req.body.number) {
-    return res
-      .status(400)
-      .send({ error: 'no body given' })
-      .end()
-  }
-
-  Person.countDocuments({name: req.body.name})
-    .then(count => {
-      if (count > 0) {
-        return res
-          .status(400)
-          .send({ error: 'name must be unique' })
-          .end()
-      }
-
-      const personData = {name: req.body.name, number: req.body.number}
-      const person = new Person(personData)
-      return person.save()
-    })
+  const personData = { name: req.body.name, number: req.body.number }
+  const person = new Person(personData)
+  person.save()
     .then(person => res.send(person))
     .catch(e => next(e))
 })
@@ -60,7 +43,7 @@ router.put('/:id', (req, res, next) => {
   if (id == null || id == "") {
     return res
       .status(404)
-      .send({error: "malformatted id"})
+      .send({ error: "malformatted id" })
       .end()
   }
 
@@ -71,8 +54,8 @@ router.put('/:id', (req, res, next) => {
       .end()
   }
 
-  const personData = {name: req.body.name, number: req.body.number}
-  Person.findByIdAndUpdate(id, personData, {new: true})
+  const personData = { name: req.body.name, number: req.body.number }
+  Person.findByIdAndUpdate(id, personData, { new: true })
     .then(person => res.send(person))
     .catch(e => next(e))
 })
@@ -82,7 +65,7 @@ router.delete('/:id', (req, res, next) => {
   if (id == null || id == "") {
     return res
       .status(404)
-      .send({error: "malformatted id"})
+      .send({ error: "malformatted id" })
       .end()
   }
 
