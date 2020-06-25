@@ -3,13 +3,17 @@ const router = express.Router()
 const db = require('../data/db')
 const Person = require('../data/person')
 
-const generateId = () => Math.round(Math.random() * 1000000000)
+const handleError = res => e => {
+  console.log(e)
+  res.status(500).end()
+}
 
 router.get('/', (req, res) => {
   Person.find({})
     .then(persons => {
       res.send(persons)
     })
+    .catch(handleError(res))
 })
 
 router.get('/:id', (req, res) => {
@@ -22,11 +26,14 @@ router.get('/:id', (req, res) => {
   }
 
   const person = Person.findById(id)
-    .then(person => res.send(person))
-    .catch(e => {
-      console.log(e)
-      res.status(404).end()
+    .then(person => {
+      if (person) {
+        res.send(person)
+      } else {
+        res.status(404).end()
+      }
     })
+    .catch(handleError)
 })
 
 router.post('/', (req, res) => {
@@ -34,34 +41,38 @@ router.post('/', (req, res) => {
     return res
       .status(400)
       .send({ error: 'no body given' })
-      .end()
+      .end(handleError(res))
   }
 
-  if (db.persons.some(p => p.name === req.body.name)) {
-    return res
-      .status(400)
-      .send({ error: 'name must be unique' })
-      .end()
-  }
+  Person.countDocuments({name: req.body.name})
+    .then(count => {
+      if (count > 0) {
+        return res
+          .status(400)
+          .send({ error: 'name must be unique' })
+          .end()
+      }
 
-  const newPerson = {
-    name: req.body.name,
-    number: req.body.number,
-    id: generateId()
-  }
-  db.persons.push(newPerson)
-
-  res.send(newPerson)
+      const person = new Person({name: req.body.name, number: req.body.number})
+      person.save()
+        .then(result => res.send(result))
+        .catch(handleError(res))
+    })
+    .catch(handleError(res))
 })
 
 router.delete('/:id', (req, res) => {
-  const id = Number(req.params.id)
-  if (isNaN(id)) {
-    return res.status(204).end()
+  const id = req.params.id
+  if (id == null || id == "") {
+    return res
+      .status(404)
+      .send({error: "invalid id given"})
+      .end()
   }
 
-  db.persons = db.persons.filter(p => p.id !== id)
-  res.status(204).end()
+  Person.findByIdAndDelete(id)
+    .then(res.status(204).end())
+    .catch(handleError(res))
 })
 
 module.exports = router
