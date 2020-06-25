@@ -3,25 +3,20 @@ const router = express.Router()
 const db = require('../data/db')
 const Person = require('../data/person')
 
-const handleError = res => e => {
-  console.log(e)
-  res.status(500).end()
-}
-
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
   Person.find({})
     .then(persons => {
       res.send(persons)
     })
-    .catch(handleError(res))
+    .catch(e => next(e))
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
   const id = req.params.id
   if (id == null || id == "") {
     return res
       .status(404)
-      .send({error: "invalid id given"})
+      .send({error: "malformatted id"})
       .end()
   }
 
@@ -33,15 +28,15 @@ router.get('/:id', (req, res) => {
         res.status(404).end()
       }
     })
-    .catch(handleError)
+    .catch(e => next(e))
 })
 
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
   if (!req.body || !req.body.name || !req.body.number) {
     return res
       .status(400)
       .send({ error: 'no body given' })
-      .end(handleError(res))
+      .end()
   }
 
   Person.countDocuments({name: req.body.name})
@@ -56,23 +51,23 @@ router.post('/', (req, res) => {
       const person = new Person({name: req.body.name, number: req.body.number})
       person.save()
         .then(result => res.send(result))
-        .catch(handleError(res))
+        .catch(e => next(e))
     })
-    .catch(handleError(res))
+    .catch(e => next(e))
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res, next) => {
   const id = req.params.id
   if (id == null || id == "") {
     return res
       .status(404)
-      .send({error: "invalid id given"})
+      .send({error: "malformatted id"})
       .end()
   }
 
   Person.findByIdAndDelete(id)
     .then(res.status(204).end())
-    .catch(handleError(res))
+    .catch(e => next(e))
 })
 
 module.exports = router
