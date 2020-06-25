@@ -49,10 +49,9 @@ router.post('/', (req, res, next) => {
 
       const personData = {name: req.body.name, number: req.body.number}
       const person = new Person(personData)
-      person.save()
-        .then(result => res.send(result))
-        .catch(e => next(e))
+      return person.save()
     })
+    .then(person => res.send(person))
     .catch(e => next(e))
 })
 
