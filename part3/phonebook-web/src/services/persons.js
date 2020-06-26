@@ -8,12 +8,12 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
-const create = newObject => {
+const create = (newObject) => {
   const request = axios.post(baseUrl, newObject)
   return request.then(response => response.data)
 }
 
-const read = id => {
+const read = (id) => {
   const request = axios.get(`${baseUrl}/${id}`)
   return request.then(response => response.data)
 }
@@ -23,9 +23,15 @@ const update = (id, newObject) => {
   return request.then(response => response.data)
 }
 
-const _delete = id => {
+const deleteRequest = (id) => {
   const request = axios.delete(`${baseUrl}/${id}`)
   return request.then(response => response.data)
 }
 
-export default { getAll, read, create, update, delete: _delete }
+export default {
+  getAll,
+  read,
+  create,
+  update,
+  delete: deleteRequest,
+}

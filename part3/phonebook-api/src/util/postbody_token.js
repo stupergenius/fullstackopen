@@ -1,6 +1,6 @@
 // A morgan compatible token implementation to log the post body
 
-const token = (req, res) => {
+const token = (req) => {
   if (req.method.toLowerCase() !== 'post' || !req.body) {
     return null
   }
