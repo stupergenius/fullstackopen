@@ -1,0 +1,2 @@
+env_variables:
+  MONGODB_URI: '<your full mongodb connection URI including username+pw>'

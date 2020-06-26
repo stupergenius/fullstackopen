@@ -1,0 +1,39 @@
+{
+  "name": "phonebook-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "gcloud -q app deploy",
+    "lint": "eslint src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stupergenius/fullstackopen.git"
+  },
+  "author": "Benjamin Snider",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stupergenius/fullstackopen/issues"
+  },
+  "homepage": "https://github.com/stupergenius/fullstackopen#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "hbs": "^4.1.1",
+    "js-yaml": "^3.14.0",
+    "mongoose": "^5.9.17",
+    "mongoose-unique-validator": "^2.0.3",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.3.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.21.2",
+    "nodemon": "^2.0.4"
+  }
+}
