@@ -27,24 +27,44 @@ const favoriteBlog = (blogs) => {
   }
 }
 
-const mostBlogs = (blogs) => {
+const blogAggregate = (blogs, key, predicate) => {
   if (!Array.isArray(blogs) || blogs.length === 0) {
     return null
   }
 
-  const authorCounts = {}
+  const counts = {}
   for (const blog of blogs) {
-    authorCounts[blog.author] = (authorCounts[blog.author] || 0) + 1
+    counts[blog[key]] = (counts[blog[key]] || 0) + predicate(blog)
   }
 
-  let authorWithMost = { blogs: 0 }
-  for (const [author, numBlogs] of Object.entries(authorCounts)) {
-    if (numBlogs > authorWithMost.blogs) {
-      authorWithMost = { author, blogs: numBlogs }
+  let maxAggregated = null
+  for (const [blogKey, aggregate] of Object.entries(counts)) {
+    if (maxAggregated === null || aggregate > maxAggregated.aggregate) {
+      maxAggregated = { [key]: blogKey, aggregate }
     }
   }
 
-  return authorWithMost
+  return maxAggregated
+}
+
+const mostBlogs = (blogs) => {
+  const aggregated = blogAggregate(blogs, 'author', dummy) // cheeky
+  return aggregated === null
+    ? null
+    : {
+      author: aggregated.author,
+      blogs: aggregated.aggregate,
+    }
+}
+
+const mostLikes = (blogs) => {
+  const aggregated = blogAggregate(blogs, 'author', blog => blog.likes)
+  return aggregated == null
+    ? null
+    : {
+      author: aggregated.author,
+      likes: aggregated.aggregate,
+    }
 }
 
 module.exports = {
@@ -52,4 +72,5 @@ module.exports = {
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 }

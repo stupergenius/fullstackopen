@@ -27,6 +27,14 @@ const listWithManyBlogs = [
   },
 ]
 
+const listWithTieBlogs = [
+  {
+    _id: '5a422a851b54a676234d17f7', title: 'React patterns', author: 'Michael Chan', url: 'https://reactpatterns.com/', likes: 7, __v: 0,
+  }, {
+    _id: '5a422aa71b54a676234d17f8', title: 'Go To Statement Considered Harmful', author: 'Edsger W. Dijkstra', url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html', likes: 7, __v: 0,
+  },
+]
+
 test('dummy returns one', () => {
   const blogs = []
 
@@ -58,14 +66,6 @@ describe('total likes', () => {
 })
 
 describe('favorite blogs', () => {
-  const tieBlogs = [
-    {
-      _id: '5a422a851b54a676234d17f7', title: 'React patterns', author: 'Michael Chan', url: 'https://reactpatterns.com/', likes: 7, __v: 0,
-    }, {
-      _id: '5a422aa71b54a676234d17f8', title: 'Go To Statement Considered Harmful', author: 'Edsger W. Dijkstra', url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html', likes: 7, __v: 0,
-    },
-  ]
-
   test('returns null when no blogs given', () => {
     const result = listHelper.favoriteBlog([])
     expect(result).toBe(null)
@@ -82,7 +82,7 @@ describe('favorite blogs', () => {
   })
 
   test('returns the first blog with the highest likes when there is a tie', () => {
-    const result = listHelper.favoriteBlog(tieBlogs)
+    const result = listHelper.favoriteBlog(listWithTieBlogs)
     expect(result).toEqual({ title: 'React patterns', author: 'Michael Chan', likes: 7 })
   })
 })
@@ -104,12 +104,10 @@ describe('most blogs', () => {
     })
   })
 
-  test('returns the first author with the most blogs when there is a tie', () => {
+  test('returns an author with the most blogs when there is a tie', () => {
     const result = listHelper.mostBlogs(listWithManyBlogs.slice(0, -1))
-    expect(result).toEqual({
-      author: 'Edsger W. Dijkstra',
-      blogs: 2,
-    })
+    expect(result).not.toBe(null)
+    expect(result.blogs).toBe(2)
   })
 
   test('returns the author when a single blog is given', () => {
@@ -118,5 +116,37 @@ describe('most blogs', () => {
       author: 'Edsger W. Dijkstra',
       blogs: 1,
     })
+  })
+})
+
+describe('most likes', () => {
+  test('returns null when no blogs are given', () => {
+    const resultNull = listHelper.mostLikes(null)
+    expect(resultNull).toBe(null)
+
+    const resultEmpty = listHelper.mostLikes([])
+    expect(resultEmpty).toBe(null)
+  })
+
+  test('returns the author with the most likes', () => {
+    const resultNull = listHelper.mostLikes(listWithManyBlogs)
+    expect(resultNull).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 17,
+    })
+  })
+
+  test('returns the author when one blog given', () => {
+    const resultNull = listHelper.mostLikes(listWithOneBlog)
+    expect(resultNull).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 5,
+    })
+  })
+
+  test('returns an author with the most likes when there is a tie', () => {
+    const result = listHelper.mostLikes(listWithTieBlogs)
+    expect(result).not.toBe(null)
+    expect(result.likes).toBe(7)
   })
 })
