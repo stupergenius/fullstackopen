@@ -86,3 +86,37 @@ describe('favorite blogs', () => {
     expect(result).toEqual({ title: 'React patterns', author: 'Michael Chan', likes: 7 })
   })
 })
+
+describe('most blogs', () => {
+  test('returns null when no blogs are given', () => {
+    const resultNull = listHelper.mostBlogs(null)
+    expect(resultNull).toBe(null)
+
+    const resultEmpty = listHelper.mostBlogs([])
+    expect(resultEmpty).toBe(null)
+  })
+
+  test('returns the author with the most blogs', () => {
+    const result = listHelper.mostBlogs(listWithManyBlogs)
+    expect(result).toEqual({
+      author: 'Robert C. Martin',
+      blogs: 3,
+    })
+  })
+
+  test('returns the first author with the most blogs when there is a tie', () => {
+    const result = listHelper.mostBlogs(listWithManyBlogs.slice(0, -1))
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      blogs: 2,
+    })
+  })
+
+  test('returns the author when a single blog is given', () => {
+    const result = listHelper.mostBlogs(listWithOneBlog)
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      blogs: 1,
+    })
+  })
+})

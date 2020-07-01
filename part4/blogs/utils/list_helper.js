@@ -27,4 +27,29 @@ const favoriteBlog = (blogs) => {
   }
 }
 
-module.exports = { dummy, totalLikes, favoriteBlog }
+const mostBlogs = (blogs) => {
+  if (!Array.isArray(blogs) || blogs.length === 0) {
+    return null
+  }
+
+  const authorCounts = {}
+  for (const blog of blogs) {
+    authorCounts[blog.author] = (authorCounts[blog.author] || 0) + 1
+  }
+
+  let authorWithMost = { blogs: 0 }
+  for (const [author, numBlogs] of Object.entries(authorCounts)) {
+    if (numBlogs > authorWithMost.blogs) {
+      authorWithMost = { author, blogs: numBlogs }
+    }
+  }
+
+  return authorWithMost
+}
+
+module.exports = {
+  dummy,
+  totalLikes,
+  favoriteBlog,
+  mostBlogs,
+}
