@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --verbose"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +15,7 @@
     "eslint": "^7.3.1",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
+    "jest": "^26.1.0",
     "nodemon": "^2.0.4"
   },
   "dependencies": {
@@ -28,5 +29,8 @@
     "ignore": [
       "requests/*"
     ]
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
