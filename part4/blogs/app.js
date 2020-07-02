@@ -9,6 +9,7 @@ const blogsRouter = require('./controllers/blogs')
 
 logger.info('connecting to mongodb')
 
+mongoose.set('useFindAndModify', false)
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     logger.info('connected to MongoDB')
