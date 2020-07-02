@@ -4,7 +4,9 @@ const postBodyToken = require('./postbody_token')
 
 morgan.token('post-body', postBodyToken)
 
-const requestLogger = morgan(':method :url :status :res[content-length] - :response-time ms :post-body')
+const requestLogger = (process.env.NODE_ENV === 'test')
+  ? null
+  : morgan(':method :url :status :res[content-length] - :response-time ms :post-body')
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })

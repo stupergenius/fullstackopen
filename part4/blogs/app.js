@@ -21,7 +21,9 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
-app.use(middleware.requestLogger)
+if (middleware.requestLogger) {
+  app.use(middleware.requestLogger)
+}
 
 app.use('/api/blogs', blogsRouter)
 

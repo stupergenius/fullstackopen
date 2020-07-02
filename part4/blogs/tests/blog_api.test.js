@@ -23,8 +23,8 @@ describe('blogs api', () => {
         .get('/api/blogs')
         .expect(200)
         .expect('Content-Type', /json/)
-        .expect((res) => {
-          expect(res.body).toHaveLength(6)
+        .expect(({ body }) => {
+          expect(body).toHaveLength(fixtures.listWithManyBlogs.length)
         })
     })
 
@@ -32,10 +32,42 @@ describe('blogs api', () => {
       await api
         .get('/api/blogs')
         .expect(200)
-        .expect((res) => {
-          for (const blog of res.body) {
+        .expect(({ body }) => {
+          for (const blog of body) {
             expect(blog).toHaveProperty('id')
           }
+        })
+    })
+  })
+
+  describe('creating blogs', () => {
+    test('inserts a new blog into the list', async () => {
+      const newBlog = {
+        title: 'Something something rust',
+        author: 'Ben',
+        url: 'http://rust.example.com',
+        likes: 27,
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('id')
+          expect(body).toEqual(expect.objectContaining(newBlog))
+
+          newBlog.id = body.id
+        })
+
+      await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveLength(fixtures.listWithManyBlogs.length + 1)
+          expect(body).toContainEqual(expect.objectContaining(newBlog))
         })
     })
   })
