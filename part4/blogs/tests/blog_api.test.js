@@ -70,6 +70,23 @@ describe('blogs api', () => {
           expect(body).toContainEqual(expect.objectContaining(newBlog))
         })
     })
+
+    test('missing likes defaults to 0', async () => {
+      const newBlog = {
+        title: 'Something something rust',
+        author: 'Ben',
+        url: 'http://rust.example.com',
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('likes', 0)
+        })
+    })
   })
 })
 
