@@ -99,6 +99,47 @@ describe('blogs api', () => {
         .expect(400)
     })
   })
+
+  describe('deleting blogs', () => {
+    test('doesnt delete a non-existent blog', async () => {
+      await api.delete('/api/blogs/1234')
+
+      await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveLength(fixtures.listWithManyBlogs.length)
+        })
+    })
+
+    test('returns an error when passing an invalid id', async () => {
+      await api
+        .delete('/api/blogs/%20')
+        .expect(400)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('error')
+        })
+    })
+
+    test('deletes a blog', async () => {
+      const toDelete = fixtures.listWithManyBlogs[0]
+
+      await api
+        .delete(`/api/blogs/${toDelete._id}`)
+        .expect(204)
+
+      await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveLength(fixtures.listWithManyBlogs.length - 1)
+          expect(body.map(blog => blog.id)).not.toContain(toDelete._id)
+        })
+    })
+  })
 })
 
 afterAll(() => {
