@@ -33,7 +33,15 @@ const listWithTieBlogs = [
   },
 ]
 
+const factory = () => ({
+  title: 'Something something rust',
+  author: 'Ben',
+  url: 'http://rust.example.com',
+  likes: 27,
+})
+
 module.exports = {
+  factory,
   listWithOneBlog,
   listWithManyBlogs,
   listWithTieBlogs,

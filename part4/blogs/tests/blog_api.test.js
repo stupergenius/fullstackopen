@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const app = require('../app')
 const fixtures = require('./blog_fixtures')
 const Blog = require('../models/blog')
+const blog_fixtures = require('./blog_fixtures')
 
 const api = supertest(app)
 
@@ -42,12 +43,7 @@ describe('blogs api', () => {
 
   describe('creating blogs', () => {
     test('inserts a new blog into the list', async () => {
-      const newBlog = {
-        title: 'Something something rust',
-        author: 'Ben',
-        url: 'http://rust.example.com',
-        likes: 27,
-      }
+      const newBlog = fixtures.factory()
 
       await api
         .post('/api/blogs')
@@ -72,20 +68,35 @@ describe('blogs api', () => {
     })
 
     test('missing likes defaults to 0', async () => {
-      const newBlog = {
-        title: 'Something something rust',
-        author: 'Ben',
-        url: 'http://rust.example.com',
-      }
+      const withoutLikes = fixtures.factory()
+      delete withoutLikes.likes
 
       await api
         .post('/api/blogs')
-        .send(newBlog)
+        .send(withoutLikes)
         .expect(201)
         .expect('Content-Type', /json/)
         .expect(({ body }) => {
           expect(body).toHaveProperty('likes', 0)
         })
+    })
+
+    test('fails when required properties are not given', async () => {
+      const withoutTitle = fixtures.factory()
+      delete withoutTitle.title
+
+      const withoutUrl = fixtures.factory()
+      delete withoutUrl.url
+
+      await api
+        .post('/api/blogs')
+        .send(withoutTitle)
+        .expect(400)
+
+      await api
+        .post('/api/blogs')
+        .send(withoutUrl)
+        .expect(400)
     })
   })
 })
