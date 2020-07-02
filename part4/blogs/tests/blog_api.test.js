@@ -140,6 +140,44 @@ describe('blogs api', () => {
         })
     })
   })
+
+  describe('updating blogs', () => {
+    test('doesnt update a non-existent blog', async () => {
+      await api
+        .put('/api/blogs/1234')
+        .expect(400)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('error')
+        })
+    })
+
+    test('returns an error when passing an invalid id', async () => {
+      await api
+        .put('/api/blogs/%20')
+        .expect(400)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('error')
+        })
+    })
+
+    test('updates likes, etc.', async () => {
+      const toUpdate = fixtures.listWithManyBlogs[0]
+      toUpdate.author = 'me'
+      toUpdate.likes = Math.round(Math.random() * 1000)
+
+      await api
+        .put(`/api/blogs/${toUpdate._id}`)
+        .send(toUpdate)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('likes', toUpdate.likes)
+          expect(body).toHaveProperty('author', toUpdate.author)
+        })
+    })
+  })
 })
 
 afterAll(() => {

@@ -16,15 +16,15 @@ router.post('/', async (request, response) => {
   response.status(201).json(result)
 })
 
-router.delete('/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { id } = req.params
 
-  if (id == null || id === '') {
-    return res
-      .status(400)
-      .send({ error: 'malformatted id' })
-      .end()
-  }
+  const person = await Blog.findByIdAndUpdate(id, req.body, { new: true, runValidators: true })
+  res.send(person)
+})
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params
 
   await Blog.findByIdAndDelete(id)
   res.status(204).end()
