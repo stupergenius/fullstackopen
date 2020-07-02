@@ -17,14 +17,27 @@ beforeEach(async () => {
 })
 
 describe('blogs api', () => {
-  test('there are 6 blogs', async () => {
-    await api
-      .get('/api/blogs')
-      .expect(200)
-      .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.body).toHaveLength(6)
-      })
+  describe('retrieving blogs', () => {
+    test('there are 6 blogs', async () => {
+      await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.body).toHaveLength(6)
+        })
+    })
+
+    test('returns an id property', async () => {
+      await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect((res) => {
+          for (const blog of res.body) {
+            expect(blog).toHaveProperty('id')
+          }
+        })
+    })
   })
 })
 
