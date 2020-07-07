@@ -2,12 +2,18 @@ const supertest = require('supertest')
 const mongoose = require('mongoose')
 const app = require('../app')
 const fixtures = require('./blog_fixtures')
+const userFixtures = require('./user_fixtures')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  const newUser = new User(userFixtures.factory())
+  await newUser.save()
 
   const savePromises = fixtures.listWithManyBlogs
     .map(blog => new Blog(blog))
@@ -63,6 +69,52 @@ describe('blogs api', () => {
         .expect(({ body }) => {
           expect(body).toHaveLength(fixtures.listWithManyBlogs.length + 1)
           expect(body).toContainEqual(expect.objectContaining(newBlog))
+        })
+    })
+
+    test('associates a new blog with a user', async () => {
+      const newBlog = fixtures.factory()
+      let blogUserId = null
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('id')
+          expect(body).toEqual(expect.objectContaining(newBlog))
+
+          newBlog.id = body.id
+        })
+
+      await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveLength(fixtures.listWithManyBlogs.length + 1)
+
+          const createdBlog = body.find(b => b.id === newBlog.id)
+          expect(createdBlog).toHaveProperty('id', newBlog.id)
+          expect(createdBlog).toHaveProperty('user')
+          expect(createdBlog.user).toHaveProperty('id')
+          expect(createdBlog.user).toHaveProperty('name')
+
+          blogUserId = createdBlog.user.id
+        })
+
+      await api
+        .get('/api/users')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          const blogUser = body.find(u => u.id === blogUserId)
+          expect(blogUser).toHaveProperty('id', blogUserId)
+          expect(blogUser).toHaveProperty('blogs')
+          expect(blogUser.blogs.length).toBeGreaterThan(0)
+
+          expect(blogUser.blogs.map(b => b.id)).toContain(newBlog.id)
         })
     })
 

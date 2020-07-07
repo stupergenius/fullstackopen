@@ -16,6 +16,26 @@ beforeEach(async () => {
   await Promise.all(savePromises)
 })
 
+describe('listing users', () => {
+  test('lists users with associated blogs', async () => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /json/)
+      .expect(({ body }) => {
+        expect(body).toHaveLength(fixtures.listWithManyUsers.length)
+
+        const user = body[0]
+        expect(user).toHaveProperty('id')
+        expect(user).toHaveProperty('username')
+        expect(user).toHaveProperty('blogs')
+        expect(user.blogs.length).toBeGreaterThan(0)
+        expect(user.blogs[0]).toHaveProperty('author')
+        expect(user.blogs[0]).toHaveProperty('id')
+      })
+  })
+})
+
 describe('creating users', () => {
   test('inserting user without required fields fails', async () => {
     await api

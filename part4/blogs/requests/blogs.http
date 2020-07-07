@@ -13,7 +13,8 @@ Content-Type: application/json
     "title": "a new blog",
     "author": "ben",
     "url": "https://blog.example.com",
-    "likes": "3"
+    "likes": "3",
+    "user": "5f04c2bc24f474111b6d7c98"
 }
 
 ### Update an existing blog
