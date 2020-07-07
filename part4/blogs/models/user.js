@@ -1,17 +1,23 @@
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 const { toJson } = require('../utils/mongo')
 
 const userSchema = mongoose.Schema({
   username: {
     type: String,
+    required: true,
+    unique: true,
+    minlength: 3,
   },
   password: {
     type: String,
+    required: true,
   },
   name: {
     type: String,
   },
 })
+userSchema.plugin(uniqueValidator)
 
 const User = mongoose.model('User', userSchema)
 
