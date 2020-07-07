@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { toJson } = require('../utils/mongo')
 
 const blogSchema = mongoose.Schema({
   title: {
@@ -21,13 +22,7 @@ const blogSchema = mongoose.Schema({
 const Blog = mongoose.model('Blog', blogSchema)
 
 blogSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    const transformed = returnedObject
-    transformed.id = transformed._id.toString()
-    delete transformed._id
-    delete transformed.__v
-    return transformed
-  },
+  transform: toJson,
 })
 
 module.exports = Blog
