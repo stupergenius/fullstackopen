@@ -5,14 +5,6 @@ const User = require('../models/user')
 
 const router = express.Router()
 
-const getTokenFrom = (request) => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.substring(7)
-  }
-  return null
-}
-
 router.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
@@ -24,8 +16,7 @@ router.get('/', async (request, response) => {
 router.post('/', async (request, response) => {
   const blogData = request.body
 
-  const token = getTokenFrom(request)
-  const tokenData = await tokenizer.verify(token)
+  const tokenData = await tokenizer.verify(request.token)
   if (!tokenData || !tokenData.id) {
     return response.status(401).send({ error: 'token missing or invalid' })
   }

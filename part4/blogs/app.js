@@ -24,6 +24,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use(middleware.tokenExtractor)
 if (middleware.requestLogger) {
   app.use(middleware.requestLogger)
 }
