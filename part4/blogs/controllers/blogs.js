@@ -1,8 +1,17 @@
 const express = require('express')
+const tokenizer = require('../utils/tokenizer')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
 const router = express.Router()
+
+const getTokenFrom = (request) => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    return authorization.substring(7)
+  }
+  return null
+}
 
 router.get('/', async (request, response) => {
   const blogs = await Blog
@@ -14,8 +23,14 @@ router.get('/', async (request, response) => {
 
 router.post('/', async (request, response) => {
   const blogData = request.body
-  const user = await User.findOne({})
 
+  const token = getTokenFrom(request)
+  const tokenData = await tokenizer.verify(token)
+  if (!tokenData || !tokenData.id) {
+    return response.status(401).send({ error: 'token missing or invalid' })
+  }
+
+  const user = await User.findById(tokenData.id)
   blogData.user = user._id
   const blog = new Blog(blogData)
 

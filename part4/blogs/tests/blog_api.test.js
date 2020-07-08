@@ -1,19 +1,39 @@
 const supertest = require('supertest')
 const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
 const app = require('../app')
+const tokenizer = require('../utils/tokenizer')
+const crypto = require('../utils/crypto')
 const fixtures = require('./blog_fixtures')
 const userFixtures = require('./user_fixtures')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
 const api = supertest(app)
+let authUser = null
+
+const createBlog = (blog, options = {}) => {
+  const token = tokenizer.tokenizeSync({
+    username: authUser.username,
+    id: authUser._id.toString(),
+  })
+
+  return api.post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(blog)
+    .expect(options.code || 201)
+    .expect('Content-Type', /json/)
+}
 
 beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
 
-  const newUser = new User(userFixtures.factory())
+  const newUserData = userFixtures.factory()
+  newUserData.password = crypto.hashSync(newUserData.password)
+  const newUser = new User(newUserData)
   await newUser.save()
+  authUser = newUser
 
   const savePromises = fixtures.listWithManyBlogs
     .map(blog => new Blog(blog))
@@ -46,15 +66,60 @@ describe('blogs api', () => {
     })
   })
 
-  describe('creating blogs', () => {
-    test('inserts a new blog into the list', async () => {
+  describe('blog authorization', () => {
+    test('it fails when no user token is given', async () => {
       const newBlog = fixtures.factory()
 
       await api
         .post('/api/blogs')
         .send(newBlog)
-        .expect(201)
+        .expect(401)
         .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('error', 'invalid token')
+        })
+    })
+
+    test('it fails when an invalid token is given', async () => {
+      const newBlog = fixtures.factory()
+
+      await api
+        .post('/api/blogs')
+        .set('Authorization', 'Bearer asdlfksajlkj')
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('error', 'invalid token')
+        })
+    })
+
+    test('it fails when a forged token is given', async () => {
+      const newBlog = fixtures.factory()
+      const forgedToken = jwt.sign({
+        username: 'hellas',
+        id: '123',
+      }, 'not the real secret')
+
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${forgedToken}`)
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /json/)
+        .expect(({ body }) => {
+          expect(body).toHaveProperty('error', 'invalid token')
+
+          newBlog.id = body.id
+        })
+    })
+  })
+
+  describe('creating blogs', () => {
+    test('inserts a new blog into the list', async () => {
+      const newBlog = fixtures.factory()
+
+      await createBlog(newBlog)
         .expect(({ body }) => {
           expect(body).toHaveProperty('id')
           expect(body).toEqual(expect.objectContaining(newBlog))
@@ -72,15 +137,10 @@ describe('blogs api', () => {
         })
     })
 
-    test('associates a new blog with a user', async () => {
+    test('associates a new blog with the authenticated user', async () => {
       const newBlog = fixtures.factory()
-      let blogUserId = null
 
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /json/)
+      await createBlog(newBlog)
         .expect(({ body }) => {
           expect(body).toHaveProperty('id')
           expect(body).toEqual(expect.objectContaining(newBlog))
@@ -98,10 +158,8 @@ describe('blogs api', () => {
           const createdBlog = body.find(b => b.id === newBlog.id)
           expect(createdBlog).toHaveProperty('id', newBlog.id)
           expect(createdBlog).toHaveProperty('user')
-          expect(createdBlog.user).toHaveProperty('id')
-          expect(createdBlog.user).toHaveProperty('name')
-
-          blogUserId = createdBlog.user.id
+          expect(createdBlog.user).toHaveProperty('id', authUser._id.toString())
+          expect(createdBlog.user).toHaveProperty('name', authUser.name)
         })
 
       await api
@@ -109,8 +167,8 @@ describe('blogs api', () => {
         .expect(200)
         .expect('Content-Type', /json/)
         .expect(({ body }) => {
-          const blogUser = body.find(u => u.id === blogUserId)
-          expect(blogUser).toHaveProperty('id', blogUserId)
+          const blogUser = body.find(u => u.id === authUser._id.toString())
+          expect(blogUser).toHaveProperty('id', authUser._id.toString())
           expect(blogUser).toHaveProperty('blogs')
           expect(blogUser.blogs.length).toBeGreaterThan(0)
 
@@ -122,11 +180,7 @@ describe('blogs api', () => {
       const withoutLikes = fixtures.factory()
       delete withoutLikes.likes
 
-      await api
-        .post('/api/blogs')
-        .send(withoutLikes)
-        .expect(201)
-        .expect('Content-Type', /json/)
+      await createBlog(withoutLikes)
         .expect(({ body }) => {
           expect(body).toHaveProperty('likes', 0)
         })
@@ -139,15 +193,9 @@ describe('blogs api', () => {
       const withoutUrl = fixtures.factory()
       delete withoutUrl.url
 
-      await api
-        .post('/api/blogs')
-        .send(withoutTitle)
-        .expect(400)
+      await createBlog(withoutTitle, { code: 400 })
 
-      await api
-        .post('/api/blogs')
-        .send(withoutUrl)
-        .expect(400)
+      await createBlog(withoutUrl, { code: 400 })
     })
   })
 
