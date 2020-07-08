@@ -1,5 +1,5 @@
 const express = require('express')
-const bcrypt = require('bcrypt')
+const crypto = require('../utils/crypto')
 const User = require('../models/user')
 
 const router = express.Router()
@@ -30,10 +30,9 @@ router.post('/', async (request, response) => {
       .send({ error: `User validation failed: password: Path \`password\` (\`${userData.password}\`) is shorter than the minimum allowed length (3).` })
   }
 
-  const saltRounds = 8
-  userData.password = await bcrypt.hash(userData.password, saltRounds)
-
+  userData.password = await crypto.hash(userData.password)
   const user = new User(userData)
+
   const result = await user.save()
   response.status(201).json(result)
 })
