@@ -11,13 +11,13 @@ const listWithManyUsers = [
     username: 'mluukkai',
     password: 'qwpeoirqwupoe',
     name: 'Matti Luukkainen',
-    blogs: blogFixtures.listWithManyBlogs.slice(2, 1).map(b => b._id),
+    blogs: blogFixtures.listWithManyBlogs.slice(2, 3).map(b => b._id),
   },
   {
     username: 'bsnider',
     password: 'zx,.cvmz.vcm,n',
     name: 'Benjamin Snider',
-    blogs: [],
+    blogs: blogFixtures.listWithManyBlogs.slice(3, 4).map(b => b._id),
   },
 ]
 

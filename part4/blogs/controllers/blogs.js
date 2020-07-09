@@ -2,6 +2,7 @@ const express = require('express')
 const tokenizer = require('../utils/tokenizer')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const token = require('../utils/postbody_token')
 
 const router = express.Router()
 
@@ -41,6 +42,20 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   const { id } = req.params
+
+  const tokenData = await tokenizer.verify(req.token)
+  if (!tokenData || !tokenData.id) {
+    return res.status(401).send({ error: 'token missing or invalid' })
+  }
+
+  const blog = await Blog.findById(id)
+  if (!blog) {
+    return res.status(204).end()
+  }
+
+  if (!blog.user || blog.user.toString() !== tokenData.id) {
+    return res.status(403).send({ error: 'insufficient permission' })
+  }
 
   await Blog.findByIdAndDelete(id)
   res.status(204).end()

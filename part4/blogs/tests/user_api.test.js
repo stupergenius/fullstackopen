@@ -2,14 +2,32 @@ const supertest = require('supertest')
 const mongoose = require('mongoose')
 const app = require('../app')
 const fixtures = require('./user_fixtures')
+const blogFixtures = require('./blog_fixtures')
 const User = require('../models/user')
+const Blog = require('../models/blog')
 
 const api = supertest(app)
 
 beforeEach(async () => {
   await User.deleteMany({})
+  await Blog.deleteMany({})
+
+  const blogSavePromises = blogFixtures.listWithManyBlogs
+    .map(blog => new Blog(blog))
+    .map(blog => blog.save())
+
+  await Promise.all(blogSavePromises)
+
+  const allBlogs = await Blog.find({})
 
   const savePromises = fixtures.listWithManyUsers
+    .map((user) => {
+      const userWithBlog = { ...user }
+      userWithBlog.blogs = allBlogs
+        .filter(blog => userWithBlog.blogs.includes(blog._id.toString()))
+        .map(blog => blog._id)
+      return userWithBlog
+    })
     .map(user => new User(user))
     .map(user => user.save())
 

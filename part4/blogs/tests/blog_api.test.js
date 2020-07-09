@@ -18,11 +18,24 @@ const createBlog = (blog, options = {}) => {
     id: authUser._id.toString(),
   })
 
-  return api.post('/api/blogs')
+  return api
+    .post('/api/blogs')
     .set('Authorization', `Bearer ${token}`)
     .send(blog)
     .expect(options.code || 201)
     .expect('Content-Type', /json/)
+}
+
+const deleteBlog = (id, options = {}) => {
+  const token = tokenizer.tokenizeSync({
+    username: authUser.username,
+    id: authUser._id.toString(),
+  })
+
+  return api
+    .delete(`/api/blogs/${id}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(options.code || 204)
 }
 
 beforeEach(async () => {
@@ -36,6 +49,11 @@ beforeEach(async () => {
   authUser = newUser
 
   const savePromises = fixtures.listWithManyBlogs
+    .map((blog) => {
+      const userBlog = { ...blog }
+      userBlog.user = authUser._id
+      return userBlog
+    })
     .map(blog => new Blog(blog))
     .map(blog => blog.save())
 
@@ -43,6 +61,88 @@ beforeEach(async () => {
 })
 
 describe('blogs api', () => {
+  describe('blog authorization', () => {
+    describe('creating blogs', () => {
+      test('it fails when no user token is given', async () => {
+        const newBlog = fixtures.factory()
+
+        await api
+          .post('/api/blogs')
+          .send(newBlog)
+          .expect(401)
+          .expect('Content-Type', /json/)
+          .expect(({ body }) => {
+            expect(body).toHaveProperty('error', 'invalid token')
+          })
+      })
+
+      test('it fails when an invalid token is given', async () => {
+        const newBlog = fixtures.factory()
+
+        await api
+          .post('/api/blogs')
+          .set('Authorization', 'Bearer asdlfksajlkj')
+          .send(newBlog)
+          .expect(401)
+          .expect('Content-Type', /json/)
+          .expect(({ body }) => {
+            expect(body).toHaveProperty('error', 'invalid token')
+          })
+      })
+
+      test('it fails when a forged token is given', async () => {
+        const newBlog = fixtures.factory()
+        const forgedToken = jwt.sign({
+          username: 'hellas',
+          id: '123',
+        }, 'not the real secret')
+
+        await api
+          .post('/api/blogs')
+          .set('Authorization', `Bearer ${forgedToken}`)
+          .send(newBlog)
+          .expect(401)
+          .expect('Content-Type', /json/)
+          .expect(({ body }) => {
+            expect(body).toHaveProperty('error', 'invalid token')
+
+            newBlog.id = body.id
+          })
+      })
+    })
+
+    describe('deleting blogs', () => {
+      it('fails when no authorization is given', async () => {
+        const toDelete = fixtures.listWithManyBlogs[0]
+
+        await api
+          .delete(`/api/blogs/${toDelete._id}`)
+          .expect(401)
+          .expect('Content-Type', /json/)
+          .expect(({ body }) => {
+            expect(body).toHaveProperty('error', 'invalid token')
+          })
+      })
+
+      it('fails when the authenticated user is not the owner of a blog', async () => {
+        const toDelete = fixtures.listWithManyBlogs[0]
+        const token = tokenizer.tokenizeSync({
+          username: 'not_a_real_user',
+          id: 'sldfkjdlfkj',
+        })
+
+        await api
+          .delete(`/api/blogs/${toDelete._id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .expect(403)
+          .expect('Content-Type', /json/)
+          .expect(({ body }) => {
+            expect(body).toHaveProperty('error', 'insufficient permission')
+          })
+      })
+    })
+  })
+
   describe('retrieving blogs', () => {
     test('there are 6 blogs', async () => {
       await api
@@ -62,55 +162,6 @@ describe('blogs api', () => {
           for (const blog of body) {
             expect(blog).toHaveProperty('id')
           }
-        })
-    })
-  })
-
-  describe('blog authorization', () => {
-    test('it fails when no user token is given', async () => {
-      const newBlog = fixtures.factory()
-
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(401)
-        .expect('Content-Type', /json/)
-        .expect(({ body }) => {
-          expect(body).toHaveProperty('error', 'invalid token')
-        })
-    })
-
-    test('it fails when an invalid token is given', async () => {
-      const newBlog = fixtures.factory()
-
-      await api
-        .post('/api/blogs')
-        .set('Authorization', 'Bearer asdlfksajlkj')
-        .send(newBlog)
-        .expect(401)
-        .expect('Content-Type', /json/)
-        .expect(({ body }) => {
-          expect(body).toHaveProperty('error', 'invalid token')
-        })
-    })
-
-    test('it fails when a forged token is given', async () => {
-      const newBlog = fixtures.factory()
-      const forgedToken = jwt.sign({
-        username: 'hellas',
-        id: '123',
-      }, 'not the real secret')
-
-      await api
-        .post('/api/blogs')
-        .set('Authorization', `Bearer ${forgedToken}`)
-        .send(newBlog)
-        .expect(401)
-        .expect('Content-Type', /json/)
-        .expect(({ body }) => {
-          expect(body).toHaveProperty('error', 'invalid token')
-
-          newBlog.id = body.id
         })
     })
   })
@@ -201,7 +252,7 @@ describe('blogs api', () => {
 
   describe('deleting blogs', () => {
     test('doesnt delete a non-existent blog', async () => {
-      await api.delete('/api/blogs/1234')
+      await deleteBlog('5efb8d9443df3806b12f48d3')
 
       await api
         .get('/api/blogs')
@@ -213,21 +264,17 @@ describe('blogs api', () => {
     })
 
     test('returns an error when passing an invalid id', async () => {
-      await api
-        .delete('/api/blogs/%20')
-        .expect(400)
+      await deleteBlog('%20', { code: 400 })
         .expect('Content-Type', /json/)
         .expect(({ body }) => {
-          expect(body).toHaveProperty('error')
+          expect(body).toHaveProperty('error', 'malformatted id')
         })
     })
 
     test('deletes a blog', async () => {
       const toDelete = fixtures.listWithManyBlogs[0]
 
-      await api
-        .delete(`/api/blogs/${toDelete._id}`)
-        .expect(204)
+      await deleteBlog(toDelete._id)
 
       await api
         .get('/api/blogs')
