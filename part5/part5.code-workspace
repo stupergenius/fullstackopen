@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "blogs-api"
+		},
+		{
+			"path": "blogs-web"
+		}
+	],
+	"remoteAuthority": "wsl+Ubuntu-18.04"
+}
