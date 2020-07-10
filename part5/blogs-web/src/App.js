@@ -72,6 +72,7 @@ const App = () => {
 
       setNewBlog({ title: '', author: '', url: '' })
       setBlogs(blogs.concat([addedBlog]))
+      showSuccess(`a new blog ${addedBlog.title} by ${newBlog.author} added`)
     } catch (exception) {
       showError(`Error creating blog: ${exception.message}`)
     }
