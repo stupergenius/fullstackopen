@@ -12,9 +12,19 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
 
-  useEffect(async () => {
-    const allBlogs = await blogService.getAll()
-    setBlogs(allBlogs)
+  useEffect(() => {
+    const fetchData = async () => {
+      const allBlogs = await blogService.getAll()
+      setBlogs(allBlogs)
+    }
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const storedUser = window.localStorage.getItem('user')
+    if (!storedUser) return
+
+    setUser(JSON.parse(storedUser))
   }, [])
 
   const showSuccess = (message) => {
@@ -35,11 +45,18 @@ const App = () => {
       const newUser = await loginService.login(username, password)
 
       setUser(newUser)
+      window.localStorage.setItem('user', JSON.stringify(newUser))
+
       setUsername('')
       setPassword('')
     } catch (exception) {
       showError('Wrong Credentials')
     }
+  }
+
+  const handleLogout = () => {
+    setUser(null)
+    window.localStorage.removeItem('user')
   }
 
   const loginForm = () => (
@@ -70,13 +87,19 @@ const App = () => {
     <div>
       <h2>{user === null ? 'log in to application' : 'blogs'}</h2>
 
+      {user !== null && (
+        <p>
+          {user.name} logged in&nbsp;
+          <button style={{ display: 'relative' }} type="button" onClick={handleLogout}>logout</button>
+        </p>
+      )}
+
       <Notification type="success" message={successMessage} />
       <Notification type="error" message={errorMessage} />
 
       {user === null
         ? loginForm()
-        : blogs.map(blog => <Blog key={blog.id} blog={blog} />)
-      }
+        : blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
     </div>
   )
 }
