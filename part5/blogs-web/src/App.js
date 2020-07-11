@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -12,6 +13,7 @@ const App = () => {
   const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
   const [successMessage, setSuccessMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
+  const blogFormRef = useRef()
 
   const fetchBlogs = async () => {
     const allBlogs = await blogService.getAll()
@@ -72,6 +74,7 @@ const App = () => {
 
       setNewBlog({ title: '', author: '', url: '' })
       setBlogs(blogs.concat([addedBlog]))
+      blogFormRef.current.toggleVisibility()
       showSuccess(`a new blog ${addedBlog.title} by ${newBlog.author} added`)
     } catch (exception) {
       showError(`Error creating blog: ${exception.message}`)
@@ -153,7 +156,10 @@ const App = () => {
         ? loginForm()
         : (
           <div>
-            {blogForm()}
+            <Togglable buttonLabel="new note" ref={blogFormRef}>
+              {blogForm()}
+            </Togglable>
+            <br />
             {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
           </div>
         )}
