@@ -10,7 +10,7 @@ const blog = {
   likes: 5,
 }
 
-test('it renders content when closed', () => {
+test('it calls `createBlog` with the form blog data', () => {
   const createMock = jest.fn()
 
   const component = render(
