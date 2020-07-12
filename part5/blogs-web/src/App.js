@@ -16,6 +16,8 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const blogFormRef = useRef()
 
+  const isUserOwner = blog => blog.user && blog.user.username === user.username
+
   const fetchBlogs = async () => {
     const allBlogs = await blogService.getAll()
     setBlogs(sortBlogs(allBlogs))
@@ -129,7 +131,7 @@ const App = () => {
                 blog={blog}
                 onLike={handleLikeBlog}
                 onRemove={handleDeleteBlog}
-                showRemove={blog.user && blog.user.username === user.username}
+                showRemove={isUserOwner(blog)}
               />
             ))}
           </div>

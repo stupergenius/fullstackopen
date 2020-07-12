@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const blogStyle = {
   paddingLeft: 2,
@@ -52,6 +53,22 @@ const Blog = ({
         : <SimpleBlog blog={blog} onView={() => setIsExpanded(true)} />}
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    likes: PropTypes.number.isRequired,
+  }).isRequired,
+  onLike: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
+  showRemove: PropTypes.bool,
+}
+
+Blog.defaultProps = {
+  showRemove: false,
 }
 
 export default Blog
