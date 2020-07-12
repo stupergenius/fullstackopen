@@ -89,6 +89,20 @@ const App = () => {
     }
   }
 
+  const handleDeleteBlog = async (blog) => {
+    if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)) {
+      try {
+        await blogService.delete(blog.id)
+
+        const allBlogs = blogs.filter(p => p.id !== blog.id)
+        setBlogs(sortBlogs(allBlogs))
+        setSuccessMessage(`Deleted blog: ${blog.title}`)
+      } catch (exception) {
+        setErrorMessage(`Error deleting blog: ${blog.title}`)
+      }
+    }
+  }
+
   return (
     <div>
       <h2>{user === null ? 'log in to application' : 'blogs'}</h2>
@@ -109,7 +123,15 @@ const App = () => {
               <BlogForm createBlog={handleSubmitBlog} />
             </Togglable>
             <br />
-            {blogs.map(blog => <Blog key={blog.id} blog={blog} onLike={handleLikeBlog} />)}
+            {blogs.map(blog => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                onLike={handleLikeBlog}
+                onRemove={handleDeleteBlog}
+                showRemove={blog.user && blog.user.username === user.username}
+              />
+            ))}
           </div>
         )}
     </div>
