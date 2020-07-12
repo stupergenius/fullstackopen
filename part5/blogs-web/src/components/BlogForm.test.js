@@ -39,3 +39,30 @@ test('it calls `createBlog` with the form blog data', () => {
     url: blog.url,
   })
 })
+
+test('it clears the form after submitting', () => {
+  const component = render(
+    <BlogForm
+      createBlog={jest.fn()}
+    />,
+  )
+
+  const form = component.container.querySelector('form')
+
+  fireEvent.change(form.querySelector('input[name="blog_title"'), {
+    target: { value: blog.title },
+  })
+  fireEvent.change(form.querySelector('input[name="blog_author"'), {
+    target: { value: blog.author },
+  })
+  fireEvent.change(form.querySelector('input[name="blog_url"'), {
+    target: { value: blog.url },
+  })
+  fireEvent.submit(form)
+
+  expect(form).toHaveFormValues({
+    blog_title: '',
+    blog_author: '',
+    blog_url: '',
+  })
+})
