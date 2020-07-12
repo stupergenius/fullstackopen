@@ -14,7 +14,7 @@ const getAll = async () => {
 }
 
 const create = async (blog) => {
-  const newBlog = await axios({
+  const response = await axios({
     method: 'post',
     url: baseUrl,
     data: blog,
@@ -22,11 +22,17 @@ const create = async (blog) => {
       Authorization: authHeader,
     },
   })
-  return newBlog.data
+  return response.data
+}
+
+const update = async (id, blog) => {
+  const response = await axios.put(`${baseUrl}/${id}`, blog)
+  return response.data
 }
 
 export default {
   setToken,
   getAll,
   create,
+  update,
 }

@@ -73,6 +73,19 @@ const App = () => {
     }
   }
 
+  const handleLikeBlog = async (blog) => {
+    try {
+      const likedBlog = await blogService.update(blog.id, {
+        ...blog,
+        likes: blog.likes + 1,
+      })
+
+      setBlogs(blogs.map(b => (b.id === likedBlog.id ? likedBlog : b)))
+    } catch (exception) {
+      showError(`Error liking blog: ${exception.message}`)
+    }
+  }
+
   return (
     <div>
       <h2>{user === null ? 'log in to application' : 'blogs'}</h2>
@@ -93,7 +106,7 @@ const App = () => {
               <BlogForm createBlog={handleSubmitBlog} />
             </Togglable>
             <br />
-            {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+            {blogs.map(blog => <Blog key={blog.id} blog={blog} onLike={handleLikeBlog} />)}
           </div>
         )}
     </div>
