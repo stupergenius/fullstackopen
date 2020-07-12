@@ -26,7 +26,10 @@ const create = async (blog) => {
 }
 
 const update = async (id, blog) => {
-  const response = await axios.put(`${baseUrl}/${id}`, blog)
+  const toUpdate = { ...blog }
+  delete toUpdate.user
+
+  const response = await axios.put(`${baseUrl}/${id}`, toUpdate)
   return response.data
 }
 

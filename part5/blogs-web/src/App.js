@@ -7,6 +7,8 @@ import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 
+const sortBlogs = blogs => blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1))
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
@@ -16,7 +18,7 @@ const App = () => {
 
   const fetchBlogs = async () => {
     const allBlogs = await blogService.getAll()
-    setBlogs(allBlogs)
+    setBlogs(sortBlogs(allBlogs))
   }
 
   useEffect(() => {
@@ -80,7 +82,8 @@ const App = () => {
         likes: blog.likes + 1,
       })
 
-      setBlogs(blogs.map(b => (b.id === likedBlog.id ? likedBlog : b)))
+      const allBlogs = blogs.map(b => (b.id === likedBlog.id ? likedBlog : b))
+      setBlogs(sortBlogs(allBlogs))
     } catch (exception) {
       showError(`Error liking blog: ${exception.message}`)
     }

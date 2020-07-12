@@ -2,7 +2,6 @@ const express = require('express')
 const tokenizer = require('../utils/tokenizer')
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const token = require('../utils/postbody_token')
 
 const router = express.Router()
 
