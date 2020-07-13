@@ -55,5 +55,29 @@ describe('Blog app', () => {
       cy.contains('My New Blog')
       cy.contains('BenS')
     })
+
+    it('A blog can be liked', () => {
+      cy.request({
+        method: 'POST',
+        url: 'http://localhost:3003/api/blogs',
+        body: {
+          title: 'My New Blog',
+          author: 'BenS',
+          url: 'http://blog.example.com'
+        },
+        auth: {
+          bearer: JSON.parse(localStorage.getItem('user')).token,
+        },
+      }).then(() => {
+        cy.visit('http://localhost:3000')
+      })
+
+      cy.get('button:contains("view")').click()
+
+      cy.contains('likes 0')
+      cy.get('button:contains("like")').click()
+      cy.get('button:contains("like")').click()
+      cy.contains('likes 2')
+    })
   })
 })
