@@ -3,6 +3,7 @@ module.exports = {
     es2020: true,
     browser: true,
     jest: true,
+    "cypress/globals": true,
   },
   extends: [
     'plugin:react/recommended',
@@ -16,7 +17,7 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: [
-    'react',
+    'react', 'jest', 'cypress',
   ],
   rules: {
     indent: [
