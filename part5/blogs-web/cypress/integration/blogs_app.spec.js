@@ -6,6 +6,11 @@ describe('Blog app', () => {
       password: 'asdf',
       name: 'Ben S',
     })
+    cy.request('POST', 'http://localhost:3003/api/users', {
+      username: 'neb',
+      password: 'asdf',
+      name: 'Ben S',
+    })
     cy.visit('http://localhost:3000')
   })
 
@@ -56,28 +61,95 @@ describe('Blog app', () => {
       cy.contains('BenS')
     })
 
-    it('A blog can be liked', () => {
-      cy.request({
-        method: 'POST',
-        url: 'http://localhost:3003/api/blogs',
-        body: {
-          title: 'My New Blog',
-          author: 'BenS',
-          url: 'http://blog.example.com'
-        },
-        auth: {
-          bearer: JSON.parse(localStorage.getItem('user')).token,
-        },
-      }).then(() => {
-        cy.visit('http://localhost:3000')
+    describe('When a blog exists', () => {
+      beforeEach(() => {
+        cy.request({
+          method: 'POST',
+          url: 'http://localhost:3003/api/blogs',
+          body: {
+            title: 'My New Blog',
+            author: 'BenS',
+            url: 'http://blog.example.com'
+          },
+          auth: {
+            bearer: JSON.parse(localStorage.getItem('user')).token,
+          },
+        }).then(() => {
+          cy.visit('http://localhost:3000')
+        })
       })
 
-      cy.get('button:contains("view")').click()
+      it('A blog can be liked', () => {
+        cy.get('button:contains("view")').click()
 
-      cy.contains('likes 0')
-      cy.get('button:contains("like")').click()
-      cy.get('button:contains("like")').click()
-      cy.contains('likes 2')
+        cy.contains('likes 0')
+        cy.get('button:contains("like")').click()
+        cy.get('button:contains("like")').click()
+        cy.contains('likes 2')
+      })
+
+      it('A blog can be deleted', () => {
+        cy.get('button:contains("view")').click()
+        cy.get('button:contains("remove")').click()
+
+        cy
+          .contains('My New Blog')
+          .parent()
+          .find('button:contains("remove")')
+          .should('not.exist')
+      })
+
+      it('A blog can be deleted only by the owner', () => {
+        // Login `neb` user and make him a blog
+        // Then assert whether `ben` user can delete `neb`'s blog
+
+        cy.request('POST', 'http://localhost:3003/api/login', {
+          username: 'neb', password: 'asdf',
+        }).then((response) => {
+          cy.request({
+            method: 'POST',
+            url: 'http://localhost:3003/api/blogs',
+            body: {
+              title: 'Nebs new blog',
+              author: 'NebR',
+              url: 'http://neb.example.com',
+            },
+            auth: {
+              bearer: response.body.token,
+            },
+          }).then(() => {
+            cy.visit('http://localhost:3000')
+          })
+        })
+
+        // we're still logged in as `ben` at this point,
+        // so we should only be able to delete his blogs
+
+        cy
+          .contains('My New Blog')
+          .parent()
+          .find('button:contains("view")')
+          .click()
+
+        cy
+          .contains('My New Blog')
+          .parent()
+          .find('button:contains("remove")')
+
+        // But not `neb`s blogs
+
+        cy
+          .contains('Nebs new blog')
+          .parent()
+          .find('button:contains("view")')
+          .click()
+
+        cy
+          .contains('Nebs new blog')
+          .parent()
+          .find('button:contains("remove")')
+          .should('not.exist')
+      })
     })
   })
 })
