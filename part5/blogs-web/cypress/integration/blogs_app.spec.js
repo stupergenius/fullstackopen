@@ -69,7 +69,8 @@ describe('Blog app', () => {
           body: {
             title: 'My New Blog',
             author: 'BenS',
-            url: 'http://blog.example.com'
+            url: 'http://blog.example.com',
+            likes: 5,
           },
           auth: {
             bearer: JSON.parse(localStorage.getItem('user')).token,
@@ -82,10 +83,10 @@ describe('Blog app', () => {
       it('A blog can be liked', () => {
         cy.get('button:contains("view")').click()
 
-        cy.contains('likes 0')
+        cy.contains('likes 5')
         cy.get('button:contains("like")').click()
         cy.get('button:contains("like")').click()
-        cy.contains('likes 2')
+        cy.contains('likes 7')
       })
 
       it('A blog can be deleted', () => {
@@ -113,6 +114,7 @@ describe('Blog app', () => {
               title: 'Nebs new blog',
               author: 'NebR',
               url: 'http://neb.example.com',
+              likes: 2,
             },
             auth: {
               bearer: response.body.token,
@@ -149,6 +151,44 @@ describe('Blog app', () => {
           .parent()
           .find('button:contains("remove")')
           .should('not.exist')
+      })
+
+      it('Blogs are sorted by likes descending', () => {
+        cy.request({
+          method: 'POST',
+          url: 'http://localhost:3003/api/blogs',
+          body: {
+            title: 'A second blog',
+            author: 'BenS',
+            url: 'http://blog.example.com',
+            likes: 25,
+          },
+          auth: {
+            bearer: JSON.parse(localStorage.getItem('user')).token,
+          },
+        }).then(() => {
+          cy.visit('http://localhost:3000')
+        })
+
+        cy.get('button:contains("view")').each((button) => {
+          cy.wrap(button).click()
+        })
+
+        let currentLikes = Infinity
+        cy
+          .get('button:contains("hide")')
+          .each((p) => {
+            cy.wrap(p).parent().should((content) => {
+              const matches = content.text().match(/likes (\d+)/)
+              if (matches.length < 2) return
+
+              const likes = parseInt(matches[1], 10)
+              if (Number.isNaN(likes)) return
+
+              expect(currentLikes).to.be.at.least(likes) // really verbose gte...
+              currentLikes = likes
+            })
+          })
       })
     })
   })
