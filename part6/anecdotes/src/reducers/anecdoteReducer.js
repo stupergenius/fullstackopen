@@ -24,6 +24,10 @@ export const voteActionFor = id => ({
   data: { id },
 })
 
+export const newAnecdoteActionWith = anecdote => ({
+  type: 'NEW_ANECDOTE',
+  data: { anecdote }
+})
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -31,6 +35,8 @@ const reducer = (state = initialState, action) => {
       const existing = state.find(a => a.id === action.data.id)
       const voted = { ...existing, votes: existing.votes + 1 }
       return state.map(a => a.id === voted.id ? voted : a)
+    case 'NEW_ANECDOTE':
+      return [ ...state, asObject(action.data.anecdote) ]
     default:
       return state
   }
