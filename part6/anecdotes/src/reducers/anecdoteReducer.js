@@ -1,14 +1,19 @@
 import anecdoteService from '../services/anecdotes'
 
-export const voteActionFor = id => ({
+export const voteAction = id => ({
   type: 'VOTE',
   data: { id },
 })
 
-export const newAnecdoteActionWith = anecdote => ({
-  type: 'NEW_ANECDOTE',
-  data: anecdote,
-})
+export const newAnecdoteAction = (content) => {
+  return async (dispatch) => {
+    const anecdote = await anecdoteService.create(content)
+    dispatch({
+      type: 'NEW_ANECDOTE',
+      data: anecdote,
+    })
+  }
+}
 
 export const initAnecdotesAction = () => {
   return async (dispatch) => {
