@@ -1,10 +1,3 @@
-const asObject = (anecdote) => {
-  return {
-    content: anecdote,
-    votes: 0
-  }
-}
-
 export const voteActionFor = id => ({
   type: 'VOTE',
   data: { id },
@@ -12,7 +5,7 @@ export const voteActionFor = id => ({
 
 export const newAnecdoteActionWith = anecdote => ({
   type: 'NEW_ANECDOTE',
-  data: { anecdote }
+  data: anecdote,
 })
 
 export const initAnecdotesAction = anecdotes => ({
@@ -27,7 +20,7 @@ const reducer = (state = [], action) => {
       const voted = { ...existing, votes: existing.votes + 1 }
       return state.map(a => a.id === voted.id ? voted : a)
     case 'NEW_ANECDOTE':
-      return [ ...state, asObject(action.data.anecdote) ]
+      return [ ...state, action.data ]
     case 'INIT_ANECDOTES':
       return action.data
     default:
