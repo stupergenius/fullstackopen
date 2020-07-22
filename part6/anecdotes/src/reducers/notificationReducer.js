@@ -1,7 +1,15 @@
-export const showNotificationAction = message => ({
-  type: 'SHOW_NOTIFICATION',
-  message
-})
+export const showNotificationAction = (message, delaySeconds) => {
+  return (dispatch) => {
+    dispatch({
+      type: 'SHOW_NOTIFICATION',
+      message
+    })
+
+    setTimeout(() => {
+      dispatch(hideNotificationAction())
+    }, delaySeconds * 1000);
+  }
+}
 
 export const hideNotificationAction = () => ({
   type: 'HIDE_NOTIFICATION',
