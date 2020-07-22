@@ -17,9 +17,9 @@ const AnecdoteList = () => {
   const anecdotes = useSelector(({ anecdotes }) => sortAnecdotes(filterAnecdotes(anecdotes)))
   const dispatch = useDispatch()
 
-  const vote = ({ id, content }) => {
-    dispatch(voteAction(id))
-    dispatch(showNotificationAction(`you voted '${content}'`))
+  const vote = (anecdote) => {
+    dispatch(voteAction(anecdote))
+    dispatch(showNotificationAction(`you voted '${anecdote.content}'`))
     setTimeout(() => dispatch(hideNotificationAction()), 5000)
   }
 
