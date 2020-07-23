@@ -1,3 +1,5 @@
+let notificationTimeoutId = null
+
 export const showNotificationAction = (message, delaySeconds) => {
   return (dispatch) => {
     dispatch({
@@ -5,7 +7,12 @@ export const showNotificationAction = (message, delaySeconds) => {
       message
     })
 
-    setTimeout(() => {
+    if (notificationTimeoutId !== null) {
+      clearTimeout(notificationTimeoutId)
+    }
+
+    notificationTimeoutId = setTimeout(() => {
+      notificationTimeoutId = null
       dispatch(hideNotificationAction())
     }, delaySeconds * 1000);
   }
