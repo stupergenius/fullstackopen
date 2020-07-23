@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import {
-  BrowserRouter as Router,
   Switch, Route, Link,
-  useParams,
-} from "react-router-dom"
+  useParams, useHistory,
+} from 'react-router-dom'
+import Notification from './components/Notification'
 
 const Menu = () => {
   const padding = {
@@ -98,6 +98,7 @@ const CreateNew = (props) => {
         </div>
         <button>create</button>
       </form>
+      <br/>
     </div>
   )
 
@@ -121,11 +122,18 @@ const App = () => {
     }
   ])
 
-  const [notification, setNotification] = useState('')
+  const [notification, setNotification] = useState(null)
+  const history = useHistory()
 
   const addNew = (anecdote) => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
     setAnecdotes(anecdotes.concat(anecdote))
+
+    history.push('/')
+    setNotification(`a new anecdote ${anecdote.content} created!`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 10000);
   }
 
   const anecdoteById = (id) =>
@@ -143,29 +151,31 @@ const App = () => {
   }
 
   return (
-    <Router>
-      <div>
-        <h1>Software anecdotes</h1>
-        <Menu />
+    <div>
+      <h1>Software anecdotes</h1>
+      <Menu />
 
-        <Switch>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/create">
-            <CreateNew addNew={addNew} />
-          </Route>
-          <Route path="/anecdotes/:id">
-            <AnecdoteDetail anecdotes={anecdotes} />
-          </Route>
-          <Route path="/">
-            <AnecdoteList anecdotes={anecdotes} />
-          </Route>
-        </Switch>
+      {notification &&
+        <Notification message={notification} />
+      }
 
-        <Footer />
-      </div>
-    </Router>
+      <Switch>
+        <Route path="/about">
+          <About />
+        </Route>
+        <Route path="/create">
+          <CreateNew addNew={addNew} />
+        </Route>
+        <Route path="/anecdotes/:id">
+          <AnecdoteDetail anecdotes={anecdotes} />
+        </Route>
+        <Route path="/">
+          <AnecdoteList anecdotes={anecdotes} />
+        </Route>
+      </Switch>
+
+      <Footer />
+    </div>
   )
 }
 
