@@ -16,6 +16,14 @@ export const newBlogAction = content => async (dispatch) => {
   })
 }
 
+export const deleteBlogAction = id => async (dispatch) => {
+  await blogService.delete(id)
+  dispatch({
+    type: 'DELETE_BLOG',
+    data: { id },
+  })
+}
+
 export const initBlogsAction = () => async (dispatch) => {
   const blogs = await blogService.getAll()
   dispatch({
@@ -32,6 +40,8 @@ const reducer = (state = [], action) => {
   }
   case 'NEW_BLOG':
     return [...state, action.data]
+  case 'DELETE_BLOG':
+    return state.filter(b => b.id !== action.data.id)
   case 'INIT_BLOGS':
     return action.data
   default:

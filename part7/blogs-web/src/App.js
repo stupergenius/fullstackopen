@@ -7,7 +7,7 @@ import loginService from './services/login'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
-import { initBlogsAction, newBlogAction, likeAction } from './reducers/blogReducer'
+import { initBlogsAction, newBlogAction, likeAction, deleteBlogAction } from './reducers/blogReducer'
 import { showNotificationAction } from './reducers/notificationReducer'
 
 const App = () => {
@@ -76,20 +76,16 @@ const App = () => {
     }
   }
 
-  const handleDeleteBlog = () => {}
-  // const handleDeleteBlog = async (blog) => {
-  //   if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)) {
-  //     try {
-  //       await blogService.delete(blog.id)
-
-  //       const allBlogs = blogs.filter(p => p.id !== blog.id)
-  //       setBlogs(sortBlogs(allBlogs))
-  //       setSuccessMessage(`Deleted blog: ${blog.title}`)
-  //     } catch (exception) {
-  //       setErrorMessage(`Error deleting blog: ${blog.title}`)
-  //     }
-  //   }
-  // }
+  const handleDeleteBlog = async (blog) => {
+    if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)) {
+      try {
+        dispatch(deleteBlogAction(blog.id))
+        showSuccess(`Deleted blog: ${blog.title}`)
+      } catch (exception) {
+        showError(`Error deleting blog: ${blog.title}`)
+      }
+    }
+  }
 
   return (
     <div>
