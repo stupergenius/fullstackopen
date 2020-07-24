@@ -1,0 +1,16 @@
+@baseUrl = http://localhost:3003/api
+
+### Get all users
+
+{{baseUrl}}/users
+
+### Create new user
+
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+    "username": "laskdjf",
+    "password": "asdf",
+    "name": "lk;ljk"
+}
