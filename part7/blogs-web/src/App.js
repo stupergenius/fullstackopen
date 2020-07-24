@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
@@ -6,26 +7,21 @@ import loginService from './services/login'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
-
-const sortBlogs = blogs => blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1))
+import { initBlogsAction, newBlogAction, likeAction } from './reducers/blogReducer'
+import { showNotificationAction } from './reducers/notificationReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  const dispatch = useDispatch()
+  const blogs = useSelector(state => state.blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1)))
+  const notification = useSelector(state => state.notification)
   const [user, setUser] = useState(null)
-  const [successMessage, setSuccessMessage] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
   const blogFormRef = useRef()
 
   const isUserOwner = blog => blog.user && blog.user.username === user.username
 
-  const fetchBlogs = async () => {
-    const allBlogs = await blogService.getAll()
-    setBlogs(sortBlogs(allBlogs))
-  }
-
   useEffect(() => {
-    fetchBlogs()
-  }, [])
+    dispatch(initBlogsAction())
+  }, [dispatch])
 
   useEffect(() => {
     const storedUser = window.localStorage.getItem('user')
@@ -37,15 +33,11 @@ const App = () => {
   }, [])
 
   const showSuccess = (message) => {
-    setSuccessMessage(message)
-
-    setTimeout(() => setSuccessMessage(null), 3000)
+    dispatch(showNotificationAction('success', message, 3))
   }
 
   const showError = (message) => {
-    setErrorMessage(message)
-
-    setTimeout(() => setErrorMessage(null), 3000)
+    dispatch(showNotificationAction('error', message, 3))
   }
 
   const handleLogin = async (username, password) => {
@@ -67,11 +59,10 @@ const App = () => {
 
   const handleSubmitBlog = async (newBlog) => {
     try {
-      const addedBlog = await blogService.create(newBlog)
+      dispatch(newBlogAction(newBlog))
 
-      setBlogs(blogs.concat([addedBlog]))
       blogFormRef.current.toggleVisibility()
-      showSuccess(`a new blog ${addedBlog.title} by ${newBlog.author} added`)
+      showSuccess(`a new blog ${newBlog.title} by ${newBlog.author} added`)
     } catch (exception) {
       showError(`Error creating blog: ${exception.message}`)
     }
@@ -79,38 +70,33 @@ const App = () => {
 
   const handleLikeBlog = async (blog) => {
     try {
-      const likedBlog = await blogService.update(blog.id, {
-        ...blog,
-        likes: blog.likes + 1,
-      })
-
-      const allBlogs = blogs.map(b => (b.id === likedBlog.id ? likedBlog : b))
-      setBlogs(sortBlogs(allBlogs))
+      dispatch(likeAction(blog))
     } catch (exception) {
       showError(`Error liking blog: ${exception.message}`)
     }
   }
 
-  const handleDeleteBlog = async (blog) => {
-    if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)) {
-      try {
-        await blogService.delete(blog.id)
+  const handleDeleteBlog = () => {}
+  // const handleDeleteBlog = async (blog) => {
+  //   if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)) {
+  //     try {
+  //       await blogService.delete(blog.id)
 
-        const allBlogs = blogs.filter(p => p.id !== blog.id)
-        setBlogs(sortBlogs(allBlogs))
-        setSuccessMessage(`Deleted blog: ${blog.title}`)
-      } catch (exception) {
-        setErrorMessage(`Error deleting blog: ${blog.title}`)
-      }
-    }
-  }
+  //       const allBlogs = blogs.filter(p => p.id !== blog.id)
+  //       setBlogs(sortBlogs(allBlogs))
+  //       setSuccessMessage(`Deleted blog: ${blog.title}`)
+  //     } catch (exception) {
+  //       setErrorMessage(`Error deleting blog: ${blog.title}`)
+  //     }
+  //   }
+  // }
 
   return (
     <div>
       <h2>{user === null ? 'log in to application' : 'blogs'}</h2>
 
-      <Notification type="success" message={successMessage} />
-      <Notification type="error" message={errorMessage} />
+      {notification
+        && <Notification type={notification.type} message={notification.message} />}
 
       {user === null
         ? <LoginForm onLogin={handleLogin} />
@@ -121,7 +107,7 @@ const App = () => {
               <button style={{ display: 'relative' }} type="button" onClick={handleLogout}>logout</button>
             </p>
 
-            <Togglable buttonLabel="new note" ref={blogFormRef}>
+            <Togglable buttonLabel="new blog" ref={blogFormRef}>
               <BlogForm createBlog={handleSubmitBlog} />
             </Togglable>
             <br />
