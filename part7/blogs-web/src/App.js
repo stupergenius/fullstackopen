@@ -1,36 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
-import blogService from './services/blogs'
-import loginService from './services/login'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
-import { initBlogsAction, newBlogAction, likeAction, deleteBlogAction } from './reducers/blogReducer'
+import {
+  initBlogsAction,
+  newBlogAction,
+  likeAction,
+  deleteBlogAction,
+} from './reducers/blogReducer'
 import { showNotificationAction } from './reducers/notificationReducer'
+import { restoreUserAction, loginUserAction, logoutUserAction } from './reducers/loginReducer'
 
 const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1)))
   const notification = useSelector(state => state.notification)
-  const [user, setUser] = useState(null)
+  const user = useSelector(state => state.user)
   const blogFormRef = useRef()
 
   const isUserOwner = blog => blog.user && blog.user.username === user.username
 
   useEffect(() => {
+    dispatch(restoreUserAction())
     dispatch(initBlogsAction())
   }, [dispatch])
-
-  useEffect(() => {
-    const storedUser = window.localStorage.getItem('user')
-    if (!storedUser) return
-
-    const existingUser = JSON.parse(storedUser)
-    setUser(existingUser)
-    blogService.setToken(existingUser.token)
-  }, [])
 
   const showSuccess = (message) => {
     dispatch(showNotificationAction('success', message, 3))
@@ -42,19 +38,14 @@ const App = () => {
 
   const handleLogin = async (username, password) => {
     try {
-      const newUser = await loginService.login(username, password)
-
-      setUser(newUser)
-      window.localStorage.setItem('user', JSON.stringify(newUser))
-      blogService.setToken(newUser.token)
+      dispatch(loginUserAction(username, password))
     } catch (exception) {
       showError('Wrong Credentials')
     }
   }
 
   const handleLogout = () => {
-    setUser(null)
-    window.localStorage.removeItem('user')
+    dispatch(logoutUserAction())
   }
 
   const handleSubmitBlog = async (newBlog) => {
