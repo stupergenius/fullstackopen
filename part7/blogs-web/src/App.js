@@ -1,5 +1,9 @@
 import React, { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import {
+  Switch, Route, Link,
+  useParams, useHistory,
+} from 'react-router-dom'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
@@ -13,6 +17,7 @@ import {
 } from './reducers/blogReducer'
 import { showNotificationAction } from './reducers/notificationReducer'
 import { restoreUserAction, loginUserAction, logoutUserAction } from './reducers/loginReducer'
+import UserList from './components/UserList'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -94,19 +99,26 @@ const App = () => {
               <button style={{ display: 'relative' }} type="button" onClick={handleLogout}>logout</button>
             </p>
 
-            <Togglable buttonLabel="new blog" ref={blogFormRef}>
-              <BlogForm createBlog={handleSubmitBlog} />
-            </Togglable>
-            <br />
-            {blogs.map(blog => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                onLike={handleLikeBlog}
-                onRemove={handleDeleteBlog}
-                showRemove={isUserOwner(blog)}
-              />
-            ))}
+            <Switch>
+              <Route path="/users">
+                <UserList />
+              </Route>
+              <Route path="/">
+                <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                  <BlogForm createBlog={handleSubmitBlog} />
+                </Togglable>
+                <br />
+                {blogs.map(blog => (
+                  <Blog
+                    key={blog.id}
+                    blog={blog}
+                    onLike={handleLikeBlog}
+                    onRemove={handleDeleteBlog}
+                    showRemove={isUserOwner(blog)}
+                  />
+                ))}
+              </Route>
+            </Switch>
           </div>
         )}
     </div>
