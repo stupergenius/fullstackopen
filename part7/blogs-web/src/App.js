@@ -1,14 +1,13 @@
 import React, { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  Switch, Route, Link,
-  useParams, useHistory,
-} from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
+import UserList from './components/UserList'
+import UserDetails from './components/UserDetails'
 import {
   initBlogsAction,
   newBlogAction,
@@ -17,7 +16,6 @@ import {
 } from './reducers/blogReducer'
 import { showNotificationAction } from './reducers/notificationReducer'
 import { restoreUserAction, loginUserAction, logoutUserAction } from './reducers/loginReducer'
-import UserList from './components/UserList'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -100,6 +98,9 @@ const App = () => {
             </p>
 
             <Switch>
+              <Route path="/users/:id">
+                <UserDetails />
+              </Route>
               <Route path="/users">
                 <UserList />
               </Route>
