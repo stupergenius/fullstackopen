@@ -7,9 +7,10 @@ import UserList from './components/UserList'
 import UserDetails from './components/UserDetails'
 import BlogList from './components/BlogList'
 import BlogDetails from './components/BlogDetails'
+import Navigation from './components/Navigation'
 import { initBlogsAction } from './reducers/blogReducer'
 import { showErrorNotificationAction } from './reducers/notificationReducer'
-import { restoreUserAction, loginUserAction, logoutUserAction } from './reducers/loginReducer'
+import { restoreUserAction, loginUserAction } from './reducers/loginReducer'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -29,14 +30,8 @@ const App = () => {
     }
   }
 
-  const handleLogout = () => {
-    dispatch(logoutUserAction())
-  }
-
   return (
     <div>
-      <h2>{user === null ? 'log in to application' : 'blogs'}</h2>
-
       {notification
         && <Notification type={notification.type} message={notification.message} />}
 
@@ -44,10 +39,8 @@ const App = () => {
         ? <LoginForm onLogin={handleLogin} />
         : (
           <div>
-            <p>
-              {user.name} logged in&nbsp;
-              <button style={{ display: 'relative' }} type="button" onClick={handleLogout}>logout</button>
-            </p>
+            <Navigation />
+            <h2>blog app</h2>
 
             <Switch>
               <Route path="/users/:id">
