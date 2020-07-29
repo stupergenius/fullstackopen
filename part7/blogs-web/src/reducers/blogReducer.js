@@ -32,6 +32,14 @@ export const initBlogsAction = () => async (dispatch) => {
   })
 }
 
+export const initBlogCommentsAction = blog => async (dispatch) => {
+  const comments = await blogService.getComments(blog.id)
+  dispatch({
+    type: 'INIT_BLOG_COMMENTS',
+    data: { blog, comments },
+  })
+}
+
 const reducer = (state = [], action) => {
   switch (action.type) {
   case 'LIKE': {
@@ -44,6 +52,10 @@ const reducer = (state = [], action) => {
     return state.filter(b => b.id !== action.data.id)
   case 'INIT_BLOGS':
     return action.data
+  case 'INIT_BLOG_COMMENTS': {
+    const blog = { ...action.data.blog, comments: action.data.comments }
+    return state.map(b => (b.id === blog.id ? blog : b))
+  }
   default:
     return state
   }

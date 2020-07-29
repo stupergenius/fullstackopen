@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useHistory } from 'react-router-dom'
 import {
@@ -6,14 +6,11 @@ import {
   deleteBlogAction,
 } from '../reducers/blogReducer'
 import { showSuccessNotificationAction, showErrorNotificationAction } from '../reducers/notificationReducer'
+import BlogComments from './BlogComments'
 
 const BlogDetails = () => {
   const dispatch = useDispatch()
   const history = useHistory()
-
-  // useEffect(() => {
-
-  // }, [dispatch])
 
   const blogId = useParams().id
   const blogs = useSelector(state => state.blogs)
@@ -54,6 +51,7 @@ const BlogDetails = () => {
         added by {blog.user ? blog.user.name : 'Unknown'} <br />
         {isUserOwner && <button type="button" onClick={handleDeleteBlog}>remove</button>}
       </p>
+      <BlogComments blog={blog} />
     </>
   )
 }
