@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm'
 import UserList from './components/UserList'
 import UserDetails from './components/UserDetails'
 import BlogList from './components/BlogList'
+import BlogDetails from './components/BlogDetails'
 import { initBlogsAction } from './reducers/blogReducer'
 import { showErrorNotificationAction } from './reducers/notificationReducer'
 import { restoreUserAction, loginUserAction, logoutUserAction } from './reducers/loginReducer'
@@ -54,6 +55,9 @@ const App = () => {
               </Route>
               <Route path="/users">
                 <UserList />
+              </Route>
+              <Route path="/blogs/:id">
+                <BlogDetails />
               </Route>
               <Route path="/">
                 <BlogList />

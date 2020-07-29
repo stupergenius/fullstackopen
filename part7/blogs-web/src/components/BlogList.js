@@ -1,11 +1,7 @@
 import React, { useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  newBlogAction,
-  likeAction,
-  deleteBlogAction,
-} from '../reducers/blogReducer'
-import Blog from './Blog'
+import { Link } from 'react-router-dom'
+import { newBlogAction } from '../reducers/blogReducer'
 import BlogForm from './BlogForm'
 import Togglable from './Togglable'
 import { showSuccessNotificationAction, showErrorNotificationAction } from '../reducers/notificationReducer'
@@ -13,10 +9,7 @@ import { showSuccessNotificationAction, showErrorNotificationAction } from '../r
 const BlogList = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
-  const user = useSelector(state => state.user)
   const blogFormRef = useRef()
-
-  const isUserOwner = blog => blog.user && blog.user.username === user.username
 
   const handleSubmitBlog = async (newBlog) => {
     try {
@@ -29,23 +22,11 @@ const BlogList = () => {
     }
   }
 
-  const handleLikeBlog = async (blog) => {
-    try {
-      dispatch(likeAction(blog))
-    } catch (exception) {
-      dispatch(showErrorNotificationAction(`Error liking blog: ${exception.message}`))
-    }
-  }
-
-  const handleDeleteBlog = async (blog) => {
-    if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)) {
-      try {
-        dispatch(deleteBlogAction(blog.id))
-        dispatch(showSuccessNotificationAction(`Deleted blog: ${blog.title}`))
-      } catch (exception) {
-        dispatch(showErrorNotificationAction(`Error deleting blog: ${blog.title}`))
-      }
-    }
+  const blogStyle = {
+    padding: 10,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5,
   }
 
   return (
@@ -55,13 +36,9 @@ const BlogList = () => {
       </Togglable>
       <br />
       {blogs.map(blog => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          onLike={handleLikeBlog}
-          onRemove={handleDeleteBlog}
-          showRemove={isUserOwner(blog)}
-        />
+        <div key={blog.id} style={blogStyle}>
+          <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+        </div>
       ))}
     </>
   )
