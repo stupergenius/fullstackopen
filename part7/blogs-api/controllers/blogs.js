@@ -1,5 +1,6 @@
 const express = require('express')
 const tokenizer = require('../utils/tokenizer')
+const commentsRouter = require('./comments')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
@@ -59,5 +60,10 @@ router.delete('/:id', async (req, res) => {
   await Blog.findByIdAndDelete(id)
   res.status(204).end()
 })
+
+router.use('/:id/comments', (req, res, next) => {
+  req.blogId = req.params.id
+  next()
+}, commentsRouter)
 
 module.exports = router

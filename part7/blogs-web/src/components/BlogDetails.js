@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useHistory } from 'react-router-dom'
 import {
@@ -10,6 +10,10 @@ import { showSuccessNotificationAction, showErrorNotificationAction } from '../r
 const BlogDetails = () => {
   const dispatch = useDispatch()
   const history = useHistory()
+
+  // useEffect(() => {
+
+  // }, [dispatch])
 
   const blogId = useParams().id
   const blogs = useSelector(state => state.blogs)
