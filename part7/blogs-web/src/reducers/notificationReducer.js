@@ -20,6 +20,9 @@ export const showNotificationAction = (type, message, delaySeconds) => (dispatch
   }, delaySeconds * 1000);
 }
 
+export const showSuccessNotificationAction = message => showNotificationAction('success', message, 3)
+export const showErrorNotificationAction = message => showNotificationAction('error', message, 3)
+
 const reducer = (state = null, action) => {
   switch (action.type) {
   case 'SHOW_NOTIFICATION':
