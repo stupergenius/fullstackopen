@@ -78,17 +78,30 @@ let books = [
   },
 ]
 
+const booksByAuthor = books.reduce((acc, book) => {
+  acc[book.author] = [...acc[book.author] || [], book]
+  return acc
+}, {})
+
 const typeDefs = gql`
   type Book {
+    id: ID!
     title: String!
     published: Int!
     author: String!
-    id: ID!
     genres: [String!]!
   }
 
+  type Author {
+    id: ID!
+    name: String!
+    born: Int
+    bookCount: Int!
+  }
+
   type Query {
-    allBooks: [Book]!
+    allBooks: [Book!]!
+    allAuthors: [Author!]!
     bookCount: Int!
     authorCount: Int!
   }
@@ -97,6 +110,7 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     allBooks: () => books,
+    allAuthors: () => authors.map(a => ({ ...a, bookCount: (booksByAuthor[a.name] || []).length })),
     bookCount: () => books.length,
     authorCount: () => authors.length,
   }
