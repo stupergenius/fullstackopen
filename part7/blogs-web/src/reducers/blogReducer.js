@@ -1,28 +1,43 @@
 import blogService from '../services/blogs'
 import commentService from '../services/comments'
+import { showErrorNotificationAction, showSuccessNotificationAction } from './notificationReducer'
 
 export const likeAction = blog => async (dispatch) => {
-  const votedBlog = await blogService.update(blog.id, { ...blog, likes: blog.likes + 1 })
-  dispatch({
-    type: 'LIKE',
-    data: votedBlog,
-  })
+  try {
+    const votedBlog = await blogService.update(blog.id, { ...blog, likes: blog.likes + 1 })
+    dispatch({
+      type: 'LIKE',
+      data: votedBlog,
+    })
+  } catch (error) {
+    dispatch(showErrorNotificationAction(`Error liking blog: ${error.message}`))
+  }
 }
 
 export const newBlogAction = content => async (dispatch) => {
-  const blog = await blogService.create(content)
-  dispatch({
-    type: 'NEW_BLOG',
-    data: blog,
-  })
+  try {
+    const blog = await blogService.create(content)
+    dispatch({
+      type: 'NEW_BLOG',
+      data: blog,
+    })
+    dispatch(showSuccessNotificationAction(`a new blog ${blog.title} by ${blog.author} added`))
+  } catch (error) {
+    dispatch(showErrorNotificationAction(`Error creating blog: ${error.message}`))
+  }
 }
 
-export const deleteBlogAction = id => async (dispatch) => {
-  await blogService.delete(id)
-  dispatch({
-    type: 'DELETE_BLOG',
-    data: { id },
-  })
+export const deleteBlogAction = blog => async (dispatch) => {
+  try {
+    await blogService.delete(blog.id)
+    dispatch({
+      type: 'DELETE_BLOG',
+      data: { id: blog.id },
+    })
+    dispatch(showSuccessNotificationAction(`Deleted blog: ${blog.title}`))
+  } catch (error) {
+    dispatch(showErrorNotificationAction(`Error deleting blog: ${blog.title}`))
+  }
 }
 
 export const initBlogsAction = () => async (dispatch) => {
@@ -42,11 +57,15 @@ export const initBlogCommentsAction = blogId => async (dispatch) => {
 }
 
 export const addBlogCommentAction = (blogId, content) => async (dispatch) => {
-  const comment = await commentService.create(blogId, content)
-  dispatch({
-    type: 'ADD_BLOG_COMMENTS',
-    data: { blogId, comment },
-  })
+  try {
+    const comment = await commentService.create(blogId, content)
+    dispatch({
+      type: 'ADD_BLOG_COMMENTS',
+      data: { blogId, comment },
+    })
+  } catch (error) {
+    dispatch(showErrorNotificationAction(`Error commenting on blog: ${error.message}`))
+  }
 }
 
 const reducer = (state = [], action) => {

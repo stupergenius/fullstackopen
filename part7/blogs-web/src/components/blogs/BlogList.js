@@ -2,7 +2,6 @@ import React, { useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { newBlogAction } from '../../reducers/blogReducer'
-import { showSuccessNotificationAction, showErrorNotificationAction } from '../../reducers/notificationReducer'
 import BlogForm from './BlogForm'
 import Togglable from '../common/Togglable'
 
@@ -12,14 +11,8 @@ const BlogList = () => {
   const blogFormRef = useRef()
 
   const handleSubmitBlog = async (newBlog) => {
-    try {
-      dispatch(newBlogAction(newBlog))
-
-      blogFormRef.current.toggleVisibility()
-      dispatch(showSuccessNotificationAction(`a new blog ${newBlog.title} by ${newBlog.author} added`))
-    } catch (exception) {
-      dispatch(showErrorNotificationAction(`Error creating blog: ${exception.message}`))
-    }
+    dispatch(newBlogAction(newBlog))
+    blogFormRef.current.toggleVisibility()
   }
 
   const blogStyle = {

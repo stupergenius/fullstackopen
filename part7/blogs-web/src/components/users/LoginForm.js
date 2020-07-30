@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { loginUserAction } from '../../reducers/loginReducer'
-import { showErrorNotificationAction } from '../../reducers/notificationReducer'
 
 const LoginForm = () => {
   const dispatch = useDispatch()
@@ -12,13 +11,9 @@ const LoginForm = () => {
   const handleLogin = (event) => {
     event.preventDefault()
 
-    try {
-      dispatch(loginUserAction(username, password))
-      setUsername('')
-      setPassword('')
-    } catch (exception) {
-      dispatch(showErrorNotificationAction('Wrong Credentials'))
-    }
+    dispatch(loginUserAction(username, password))
+    setUsername('')
+    setPassword('')
   }
 
   return (

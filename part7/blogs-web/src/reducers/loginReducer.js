@@ -1,5 +1,6 @@
 import blogService from '../services/blogs'
 import loginService from '../services/login'
+import { showErrorNotificationAction } from './notificationReducer'
 
 export const setUserAction = user => ({
   type: 'SET_USER',
@@ -15,8 +16,12 @@ export const restoreUserAction = () => (dispatch) => {
 }
 
 export const loginUserAction = (username, password) => async (dispatch) => {
-  const newUser = await loginService.login(username, password)
-  dispatch(setUserAction(newUser))
+  try {
+    const newUser = await loginService.login(username, password)
+    dispatch(setUserAction(newUser))
+  } catch (error) {
+    dispatch(showErrorNotificationAction('Wrong Credentials'))
+  }
 }
 
 export const logoutUserAction = () => ({

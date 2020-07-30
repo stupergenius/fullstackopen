@@ -5,7 +5,6 @@ import {
   likeAction,
   deleteBlogAction,
 } from '../../reducers/blogReducer'
-import { showSuccessNotificationAction, showErrorNotificationAction } from '../../reducers/notificationReducer'
 import BlogComments from './BlogComments'
 
 const BlogDetails = () => {
@@ -22,23 +21,12 @@ const BlogDetails = () => {
   const isUserOwner = blog.user && blog.user.username === user.username
   const formattedLikes = `${blog.likes} like${blog.likes !== 1 ? 's' : ''}`
 
-  const handleLikeBlog = async () => {
-    try {
-      dispatch(likeAction(blog))
-    } catch (exception) {
-      dispatch(showErrorNotificationAction(`Error liking blog: ${exception.message}`))
-    }
-  }
+  const handleLikeBlog = () => dispatch(likeAction(blog))
 
-  const handleDeleteBlog = async () => {
+  const handleDeleteBlog = () => {
     if (window.confirm(`Delete ${blog.title} by ${blog.author}?`)) {
-      try {
-        dispatch(deleteBlogAction(blog.id))
-        dispatch(showSuccessNotificationAction(`Deleted blog: ${blog.title}`))
-        history.push('/')
-      } catch (exception) {
-        dispatch(showErrorNotificationAction(`Error deleting blog: ${blog.title}`))
-      }
+      dispatch(deleteBlogAction(blog))
+      history.push('/')
     }
   }
 
