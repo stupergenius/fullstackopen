@@ -1,0 +1,34 @@
+@baseUrl = http://localhost:3003/api
+
+### Get all blogs
+
+{{baseUrl}}/blogs
+
+### Create a new blog
+
+POST {{baseUrl}}/blogs
+Content-Type: application/json
+
+{
+    "title": "a new blog",
+    "author": "ben",
+    "url": "https://blog.example.com",
+    "likes": "3",
+    "user": "5f04c2bc24f474111b6d7c98"
+}
+
+### Update an existing blog
+
+PUT {{baseUrl}}/blogs/5efba1c78f70fd0ba11c1454
+Content-Type: application/json
+
+{
+    "title": "slt sldkjf",
+    "author": "ben",
+    "url": "https://blog.example.com",
+    "likes": "176"
+}
+
+### Delete a blog
+
+DELETE {{baseUrl}}/blogs/5efb8d9443df3806b12f48d3

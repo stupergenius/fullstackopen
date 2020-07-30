@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:3003/api
+
+### Get all comments for a blog
+
+{{baseUrl}}/blogs/5efba1c78f70fd0ba11c1454/comments
+
+### Add a comment to a blog
+
+POST {{baseUrl}}/blogs/5efba1c78f70fd0ba11c1454/comments
+Content-Type: application/json
+
+{
+    "content": "real cool"
+}
