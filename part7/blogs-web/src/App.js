@@ -13,7 +13,6 @@ import { restoreUserAction } from './reducers/loginReducer'
 
 const App = () => {
   const dispatch = useDispatch()
-  const notification = useSelector(state => state.notification)
   const user = useSelector(state => state.user)
 
   useEffect(() => {
@@ -23,15 +22,17 @@ const App = () => {
 
   return (
     <div>
-      {notification
-        && <Notification type={notification.type} message={notification.message} />}
-
       {user === null
-        ? <LoginForm />
+        ? (
+          <div>
+            <Notification />
+            <LoginForm />
+          </div>
+        )
         : (
           <div>
             <Navigation />
-            <h2>blog app</h2>
+            <Notification />
 
             <Switch>
               <Route path="/users/:id">

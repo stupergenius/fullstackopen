@@ -15,24 +15,20 @@ const BlogList = () => {
     blogFormRef.current.toggleVisibility()
   }
 
-  const blogStyle = {
-    padding: 10,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
   return (
     <>
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
         <BlogForm createBlog={handleSubmitBlog} />
       </Togglable>
       <br />
-      {blogs.map(blog => (
-        <div key={blog.id} style={blogStyle}>
-          <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-        </div>
-      ))}
+
+      <ul className="list-group list-group-flush">
+        {blogs.map(blog => (
+          <li key={blog.id} className="list-group-item">
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </li>
+        ))}
+      </ul>
     </>
   )
 }

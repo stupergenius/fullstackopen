@@ -11,22 +11,19 @@ const Navigation = () => {
     dispatch(logoutUserAction())
   }
 
-  const navStyle = {
-    backgroundColor: 'lightgrey',
-    padding: '0.25em',
-  }
-
   return (
-    <div style={navStyle}>
-      <span>
-        <Link to="/">blogs</Link>&nbsp;
-        <Link to="/users">users</Link>&nbsp;
-      </span>
-      <span>
-        {user.name} logged in&nbsp;
-        <button style={{ display: 'relative' }} type="button" onClick={handleLogout}>logout</button>
-      </span>
-    </div>
+    <nav className="navbar navbar-expand-lg navbar-light bg-light mb-2">
+      <div className="container-fluid">
+        <Link className="navbar-brand" to="/">Blogs</Link>
+        <span className="nav-item mr-auto">
+          <Link className="nav-link active" to="/users">Users</Link>
+        </span>
+        <span className="navbar-text">
+          {user.name} logged in &nbsp;
+        </span>
+        <button className="btn" type="button" onClick={handleLogout}>Logout</button>
+      </div>
+    </nav>
   )
 }
 

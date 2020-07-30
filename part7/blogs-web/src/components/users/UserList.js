@@ -14,9 +14,12 @@ const UserList = () => {
   return (
     <>
       <h2>Users</h2>
-      <table>
+      <table className="table">
         <thead>
-          <tr><th>&nbsp;</th><th>blogs created</th></tr>
+          <tr>
+            <th>user</th>
+            <th>blogs created</th>
+          </tr>
         </thead>
         <tbody>
           {users.map(user => (

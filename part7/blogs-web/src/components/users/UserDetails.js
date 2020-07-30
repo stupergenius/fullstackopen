@@ -11,11 +11,11 @@ const UserList = () => {
   return (
     <>
       <h2>{user.name}</h2>
-      <p><b>added blogs</b></p>
+      <h4>added blogs</h4>
       {user.blogs.length === 0
         ? <p>None!</p>
         : (
-          <ul>
+          <ul className="list">
             {user.blogs.map(blog => (
               <li key={blog.id}>{blog.title}</li>
             ))}
