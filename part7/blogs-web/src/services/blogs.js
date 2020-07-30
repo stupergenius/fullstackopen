@@ -13,11 +13,6 @@ const getAll = async () => {
   return response.data
 }
 
-const getComments = async (id) => {
-  const response = await axios.get(`${baseUrl}/${id}/comments`)
-  return response.data
-}
-
 const create = async (blog) => {
   const response = await axios({
     method: 'post',
@@ -52,7 +47,6 @@ const deleteRequest = async (id) => {
 export default {
   setToken,
   getAll,
-  getComments,
   create,
   update,
   delete: deleteRequest,

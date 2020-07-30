@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { initBlogCommentsAction } from '../reducers/blogReducer'
+import CommentForm from './CommentForm'
 
 const BlogComments = ({ blog }) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
     if (typeof blog.comments === 'undefined') {
-      dispatch(initBlogCommentsAction(blog))
+      dispatch(initBlogCommentsAction(blog.id))
     }
   }, [dispatch, blog])
 
@@ -16,6 +17,7 @@ const BlogComments = ({ blog }) => {
   return (
     <>
       <h3>comments</h3>
+      <CommentForm blog={blog} />
       {blog.comments.length === 0
         ? <p>None yet!</p>
         : (

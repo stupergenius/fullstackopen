@@ -1,4 +1,5 @@
 import blogService from '../services/blogs'
+import commentService from '../services/comments'
 
 export const likeAction = blog => async (dispatch) => {
   const votedBlog = await blogService.update(blog.id, { ...blog, likes: blog.likes + 1 })
@@ -32,11 +33,19 @@ export const initBlogsAction = () => async (dispatch) => {
   })
 }
 
-export const initBlogCommentsAction = blog => async (dispatch) => {
-  const comments = await blogService.getComments(blog.id)
+export const initBlogCommentsAction = blogId => async (dispatch) => {
+  const comments = await commentService.getAll(blogId)
   dispatch({
     type: 'INIT_BLOG_COMMENTS',
-    data: { blog, comments },
+    data: { blogId, comments },
+  })
+}
+
+export const addBlogCommentAction = (blogId, content) => async (dispatch) => {
+  const comment = await commentService.create(blogId, content)
+  dispatch({
+    type: 'ADD_BLOG_COMMENTS',
+    data: { blogId, comment },
   })
 }
 
@@ -53,7 +62,16 @@ const reducer = (state = [], action) => {
   case 'INIT_BLOGS':
     return action.data
   case 'INIT_BLOG_COMMENTS': {
-    const blog = { ...action.data.blog, comments: action.data.comments }
+    const existingBlog = state.find(b => b.id === action.data.blogId)
+    const blog = { ...existingBlog, comments: action.data.comments }
+    return state.map(b => (b.id === blog.id ? blog : b))
+  }
+  case 'ADD_BLOG_COMMENTS': {
+    const existingBlog = state.find(b => b.id === action.data.blogId)
+    const newComments = Array.isArray(existingBlog.comments)
+      ? existingBlog.comments.concat(action.data.comment)
+      : [action.data.comment]
+    const blog = { ...existingBlog, comments: newComments }
     return state.map(b => (b.id === blog.id ? blog : b))
   }
   default:
