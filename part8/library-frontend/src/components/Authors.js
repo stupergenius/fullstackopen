@@ -3,7 +3,8 @@ import { useQuery } from '@apollo/client'
 import { ALL_AUTHORS } from '../queries'
 
 const Authors = ({ show }) => {
-  const result = useQuery(ALL_AUTHORS)
+  const results = useQuery(ALL_AUTHORS)
+  const authors = results.data ? results.data.allAuthors || [] : []
 
   if (!show) {
     return null
@@ -12,7 +13,7 @@ const Authors = ({ show }) => {
   return (
     <div>
       <h2>authors</h2>
-      {result.loading
+      {results.loading
        ? <p>loading authors...</p>
        : (
           <table>
@@ -26,7 +27,7 @@ const Authors = ({ show }) => {
                   books
                 </th>
               </tr>
-              {result.data.allAuthors.map(a =>
+              {authors.map(a =>
                 <tr key={a.name}>
                   <td>{a.name}</td>
                   <td>{a.born}</td>
