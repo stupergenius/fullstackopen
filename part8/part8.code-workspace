@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "library-api",
+			"path": "library-api"
+		},
+		{
+			"name": "library-frontend",
+			"path": "library-frontend"
+		}
+	],
+	"remoteAuthority": "wsl+Ubuntu-20.04",
+	"settings": {}
+}
