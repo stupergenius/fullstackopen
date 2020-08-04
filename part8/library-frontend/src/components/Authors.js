@@ -17,29 +17,31 @@ const Authors = ({ show, onError }) => {
       {results.loading
        ? <p>loading authors...</p>
        : (
-          <table>
-            <tbody>
-              <tr>
-                <th></th>
-                <th>
-                  born
-                </th>
-                <th>
-                  books
-                </th>
-              </tr>
-              {authors.map(a =>
-                <tr key={a.name}>
-                  <td>{a.name}</td>
-                  <td>{a.born}</td>
-                  <td>{a.bookCount}</td>
+          <>
+            <table>
+              <tbody>
+                <tr>
+                  <th></th>
+                  <th>
+                    born
+                  </th>
+                  <th>
+                    books
+                  </th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-       )}
+                {authors.map(a =>
+                  <tr key={a.name}>
+                    <td>{a.name}</td>
+                    <td>{a.born}</td>
+                    <td>{a.bookCount}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
 
-      <SetBirthyear onError={onError} />
+            <SetBirthyear authors={authors} onError={onError} />
+          </>
+       )}
 
     </div>
   )

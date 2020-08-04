@@ -1,17 +1,21 @@
 import React, { useEffect } from 'react'
+import Select from 'react-select'
 import { useMutation } from '@apollo/client'
 import { EDIT_AUTHOR } from '../queries'
 
-const SetBirthyear = ({ onError }) => {
+const SetBirthyear = ({ authors, onError }) => {
   const [editAuthor, result] = useMutation(EDIT_AUTHOR, {
     onError: e => onError(`Error updating author: ${e.message}`)
   })
+
   useEffect(() => {
     if (result.data && result.data.editAuthor === null) {
       onError('author not found')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result.data])
+
+  const authorOptions = authors.map(a => ({ value: a.name, label: a.name }))
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -32,7 +36,7 @@ const SetBirthyear = ({ onError }) => {
     <div>
       <h3>Set birthyear</h3>
       <form onSubmit={handleSubmit}>
-        <span>name <input name="name" /></span> <br/>
+        <Select name="name" options={authorOptions} />
         <span>born <input type="number" name="year" /></span> <br/>
         <button type="submit">update author</button>
       </form>
