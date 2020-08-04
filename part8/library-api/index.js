@@ -31,6 +31,7 @@ const typeDefs = gql`
     id: ID!
     title: String!
     published: Int!
+    author: Author!
     genres: [String!]!
   }
 
@@ -38,7 +39,7 @@ const typeDefs = gql`
     id: ID!
     name: String!
     born: Int
-    bookCount: Int
+    bookCount: Int!
   }
 
   type Mutation {
@@ -68,18 +69,23 @@ const idResolver = obj => obj._id
 const resolvers = {
   Query: {
     allBooks: (root, args) => {
-      //TODO: add support for filtering by author and genre
-      return Book.find({})
+      const query = {}
+      if (args.genre && args.genre.length > 0) {
+        query.genres = { $in: [args.genre] }
+      }
+      return Book.find(query)
     },
-    allAuthors: () => Author.find({}), //TODO: support bookCount property
+    allAuthors: () => Author.find({}),
     bookCount: () => Book.countDocuments({}),
     authorCount: () => Author.countDocuments({}),
   },
   Author: {
     id: idResolver,
+    bookCount: root => Book.countDocuments({ author: root.id }),
   },
   Book: {
     id: idResolver,
+    author: root => Author.findById(root.author),
   },
   Mutation: {
     addBook: async (root, args) => {
@@ -96,18 +102,15 @@ const resolvers = {
       }
       book.author = author._id
 
-      //TODO: support book.author property
-
       await book.save()
       return book
     },
-    editAuthor: (root, args) => {
-      // const author = authors.find(a => a.name === args.name)
-      // if (!author) return null
+    editAuthor: async (root, args) => {
+      const author = await Author.findOne({ name: args.name })
+      if (author === null) return null
 
-      // const updated = { ...author, born: args.setBornTo }
-      // authors = authors.map(a => a.id === updated.id ? updated : a)
-      // return augmentAuthor(updated)
+      author.born = args.setBornTo
+      return author.save()
     }
   },
 }
