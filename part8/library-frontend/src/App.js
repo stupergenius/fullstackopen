@@ -26,6 +26,7 @@ const App = () => {
 
       <Authors
         show={page === 'authors'}
+        onError={handleError}
       />
 
       <Books

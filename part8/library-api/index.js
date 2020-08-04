@@ -84,6 +84,8 @@ const booksByAuthor = books.reduce((acc, book) => {
   return acc
 }, {})
 
+const augmentAuthor = a => ({ ...a, bookCount: (booksByAuthor[a.name] || []).length })
+
 const typeDefs = gql`
   type Book {
     id: ID!
@@ -129,7 +131,7 @@ const resolvers = {
       const byGenre = args.genre ? byAuthor.filter(b => b.genres.includes(args.genre)) : byAuthor
       return byGenre
     },
-    allAuthors: () => authors.map(a => ({ ...a, bookCount: (booksByAuthor[a.name] || []).length })),
+    allAuthors: () => authors.map(augmentAuthor),
     bookCount: () => books.length,
     authorCount: () => authors.length,
   },
@@ -152,7 +154,7 @@ const resolvers = {
 
       const updated = { ...author, born: args.setBornTo }
       authors = authors.map(a => a.id === updated.id ? updated : a)
-      return updated
+      return augmentAuthor(updated)
     }
   },
 }
