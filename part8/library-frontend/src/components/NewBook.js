@@ -1,20 +1,33 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useMutation } from '@apollo/client'
+import { CREATE_BOOK, ALL_BOOKS } from '../queries'
 
-const NewBook = (props) => {
+const NewBook = ({ show, onError }) => {
   const [title, setTitle] = useState('')
   const [author, setAuhtor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
+  const [ createBook, result ] = useMutation(CREATE_BOOK, {
+    refetchQueries: [{ query: ALL_BOOKS }],
+    onError: e => onError(`Error creating book: ${e.message}`),
+  })
 
-  if (!props.show) {
+  useEffect(() => {
+    if (result.data && result.data.addBook === null) {
+      onError('Error creating book')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result.data])
+
+  if (!show) {
     return null
   }
 
   const submit = async (event) => {
     event.preventDefault()
-    
-    console.log('add book...')
+
+    createBook({ variables: { title, author, published, genres } })
 
     setTitle('')
     setPublished('')
@@ -50,7 +63,7 @@ const NewBook = (props) => {
           <input
             type='number'
             value={published}
-            onChange={({ target }) => setPublished(target.value)}
+            onChange={({ target }) => setPublished(parseInt(target.value, 10))}
           />
         </div>
         <div>
