@@ -1,15 +1,19 @@
-
 import React, { useState, useEffect } from 'react'
+import { useLazyQuery } from '@apollo/client'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import Notify from './components/Notify'
 import UserAccount from './components/UserAccount'
+import RecommendedBooks from './components/RecommendedBooks'
+import { CURRENT_USER } from './queries'
 
 const App = () => {
   const [page, setPage] = useState('authors')
   const [token, setToken] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
+  const [getUser, userResponse] = useLazyQuery(CURRENT_USER)
+  const user = (token && userResponse.data) ? userResponse.data.me : null
 
   useEffect(() => {
     const storedToken = localStorage.getItem('library-user-token')
@@ -17,6 +21,13 @@ const App = () => {
       setToken(storedToken)
     }
   }, [])
+
+  useEffect(() => {
+    if (token) {
+      getUser()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
 
   const handleError = (message) => {
     setErrorMessage(message)
@@ -29,6 +40,7 @@ const App = () => {
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
         {token && <button onClick={() => setPage('add')}>add book</button>}
+        {token && <button onClick={() => setPage('recommended')}>recommended</button>}
         <button onClick={() => setPage('user_account')}>user acount</button>
       </div>
 
@@ -49,9 +61,14 @@ const App = () => {
         onError={handleError}
       />
 
+      <RecommendedBooks
+        show={page === 'recommended'}
+        user={user}
+      />
+
       <UserAccount
         show={page === 'user_account'}
-        isLoggedIn={token !== null}
+        user={user}
         setError={handleError}
         setToken={setToken}
       />
