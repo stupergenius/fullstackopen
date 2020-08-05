@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client'
 import { ALL_AUTHORS } from '../queries'
 import SetBirthyear from './SetBirthyear'
 
-const Authors = ({ show, onError }) => {
+const Authors = ({ show, canEditAuthor, onError }) => {
   const results = useQuery(ALL_AUTHORS)
   const authors = results.data ? results.data.allAuthors || [] : []
 
@@ -39,7 +39,8 @@ const Authors = ({ show, onError }) => {
               </tbody>
             </table>
 
-            <SetBirthyear authors={authors} onError={onError} />
+            {canEditAuthor &&
+              <SetBirthyear authors={authors} onError={onError} />}
           </>
        )}
 
