@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useSubscription } from '@apollo/client'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import Notify from './components/Notify'
 import UserAccount from './components/UserAccount'
 import RecommendedBooks from './components/RecommendedBooks'
-import { CURRENT_USER } from './queries'
+import { CURRENT_USER, BOOK_ADDED } from './queries'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -14,6 +14,13 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [getUser, userResponse] = useLazyQuery(CURRENT_USER)
   const user = (token && userResponse.data) ? userResponse.data.me : null
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const book = subscriptionData.data.bookAdded
+      window.alert(`New book added: ${book.title} by ${book.author.name}`)
+    }
+  })
 
   useEffect(() => {
     const storedToken = localStorage.getItem('library-user-token')
