@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { useMutation } from '@apollo/client'
-import { CREATE_BOOK, ALL_BOOKS, ALL_AUTHORS } from '../queries'
+import { CREATE_BOOK, ALL_AUTHORS } from '../queries'
 
-const NewBook = ({ show, onError }) => {
+const NewBook = ({ show, updateCacheWith, onError }) => {
   const [title, setTitle] = useState('')
   const [author, setAuhtor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
   const [ createBook, result ] = useMutation(CREATE_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+    refetchQueries: [{ query: ALL_AUTHORS }],
     onError: e => onError(`Error creating book: ${e.message}`),
+    update: (store, response) => updateCacheWith(response.data.addBook)
   })
 
   useEffect(() => {
