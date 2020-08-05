@@ -14,7 +14,7 @@ const Books = (props) => {
     <div>
       <h2>books</h2>
       {results.loading
-       ? <p>loading authors...</p>
+       ? <p>loading books...</p>
        : (
           <table>
             <tbody>
@@ -30,7 +30,7 @@ const Books = (props) => {
               {books.map(a =>
                 <tr key={a.title}>
                   <td>{a.title}</td>
-                  <td>{a.author}</td>
+                  <td>{a.author.name}</td>
                   <td>{a.published}</td>
                 </tr>
               )}
