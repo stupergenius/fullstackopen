@@ -23,7 +23,6 @@ const resolvers = {
   },
   Author: {
     id: idResolver,
-    bookCount: root => Book.countDocuments({ author: root.id }),
   },
   Book: {
     id: idResolver,
@@ -43,12 +42,14 @@ const resolvers = {
 
       let author = await Author.findOne({ name: args.author })
       if (author === null) {
-        author = new Author({ name: args.author })
-        await author.save()
+        author = new Author({ name: args.author, bookCount: 1 })
+      } else {
+        author.bookCount += 1
       }
-      book.author = author._id
 
       try {
+        await author.save()
+        book.author = author._id
         await book.save()
       } catch (e) {
         throw new UserInputError(e.message, {
