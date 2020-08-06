@@ -1,9 +1,9 @@
-type Kilograms = Number
-type Centimeters = Number
+type Kilograms = number
+type Centimeters = number
 
 const calculateBmi = (height: Centimeters, weight: Kilograms) => {
-  const heightMetersSquared = Math.pow(Number(height) / 100.0, 2)
-  const bmi = Number(weight) / heightMetersSquared
+  const heightMetersSquared = Math.pow(height / 100.0, 2)
+  const bmi = weight / heightMetersSquared
 
   if (bmi < 15) {
     return 'Very severely underweight'
