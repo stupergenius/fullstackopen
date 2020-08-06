@@ -48,3 +48,5 @@ try {
 } catch (e) {
   console.error('Something went wrong:', e.message)
 }
+
+export default calculateBmi
