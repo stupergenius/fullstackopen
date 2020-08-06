@@ -1,13 +1,20 @@
 import express from 'express';
-import calculateBmi from './bmiCalculator';
+import { calculateBmi } from './calculators/bmi';
+import { calculateExercises } from './calculators/exercises';
 
 const app = express();
+app.use(express.json());
 
-app.use('/hello', (_, res) => {
+interface ExercisesBody {
+  daily_exercises: Array<number>
+  target: number
+}
+
+app.get('/hello', (_, res) => {
   res.send('Hello Full Stack!');
 });
 
-app.use('/bmi', (req, res) => {
+app.get('/bmi', (req, res) => {
   const { height, weight } = req.query;
 
   const heightInput = Number(height);
@@ -19,6 +26,25 @@ app.use('/bmi', (req, res) => {
   try {
     const bmi = calculateBmi(heightInput, weightInput);
     return res.send({ height, weight, bmi });
+  } catch (e) {
+    return res.status(400).send({ error: 'maformatted parameters' });
+  }
+});
+
+app.post('/exercises', (req, res) => {
+  const input = req.body as ExercisesBody;
+  if (input === null || input === undefined
+    || input.daily_exercises === null || input.daily_exercises === undefined
+    || input.target === null || input.target === undefined) {
+    return res.status(400).send({ error: 'parameters missing' });
+  }
+  if (!Array.isArray(input.daily_exercises) || Number.isNaN(Number(input.target))) {
+    return res.status(400).send({ error: 'maformatted parameters' });
+  }
+
+  try {
+    const summary = calculateExercises(input.daily_exercises, input.target);
+    return res.send(summary);
   } catch (e) {
     return res.status(400).send({ error: 'maformatted parameters' });
   }

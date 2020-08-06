@@ -1,0 +1,5 @@
+### Success
+http://localhost:3003/bmi?height=180&weight=72
+
+### Error
+http://localhost:3003/bmi?height=180&weight=seventy
