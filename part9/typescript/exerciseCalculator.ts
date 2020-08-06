@@ -26,6 +26,9 @@ const descriptionForRating = (rating: number): string => {
 }
 
 const calculateExercises = (dailyHours: Array<number>, targetHours: number): ExerciseSummary => {
+  if (targetHours <= 0) throw new Error('Target hours should be greater than zero #workForIt')
+  if (dailyHours.findIndex(h => h < 0) != -1) throw new Error('Each daily hour should be zero or a positive number #workForIt')
+
   const totalHours = dailyHours.reduce((acc, hours) => acc + hours, 0)
   const periodLength = dailyHours.length
   const average = totalHours / periodLength
