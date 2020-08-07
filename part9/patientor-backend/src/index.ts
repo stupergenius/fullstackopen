@@ -1,4 +1,6 @@
 import express from 'express';
+import diagnosesRouter from './routes/diagnoses';
+
 const app = express();
 app.use(express.json());
 
@@ -8,6 +10,8 @@ app.get('/api/ping', (_, res) => {
   console.log('someone pinged here');
   res.send('pong');
 });
+
+app.use('/api/diagnoses', diagnosesRouter);
 
 app.get('/api/patients', (_, res) => {
   res.send([]);
